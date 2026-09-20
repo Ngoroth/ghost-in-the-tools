@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires Git repository read access, permission to run project checks, and permission to write only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.0.4"
+  version: "1.1.0"
 ---
 
 # Code Review
@@ -53,7 +53,7 @@ A dedicated feature branch or worktree is preferred because it makes this bounda
 
 ## Review artifact and state
 
-Use one temporary file per plan:
+Use one review-evidence file per plan:
 
 ```text
 docs/reviews/<task-slug>.md
@@ -75,7 +75,7 @@ review_status: pending
 
 Preserve unrelated frontmatter.
 
-The artifact is not a product deliverable: never include, stage, commit, or push it. Keep it through final goal validation, then remove it during wrap-up after accepted deferred work is preserved.
+The artifact is workflow evidence. This skill may create and update it, but must not stage, commit, push, or publish it. Preserve it through goal validation and wrap-up. Wrap-up keeps it as evidence and repairs its plan reference when the plan is archived; delete it only on a separate explicit user request.
 
 Before a round:
 

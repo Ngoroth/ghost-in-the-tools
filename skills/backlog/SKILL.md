@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires access to a Git repository and permission to edit docs/backlog/ plus remove accepted MINOR findings from their source review artifacts."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.2.4"
+  version: "1.3.0"
 ---
 
 # Backlog
@@ -16,7 +16,7 @@ Maintain a small repository-local backlog under `docs/backlog/`. Each file repre
 
 - Store one task per Markdown file: `docs/backlog/<task-slug>.md`.
 - A backlog item never gates the current plan or implementation.
-- Do not use backlog to hide a missing acceptance criterion, unresolved `CRITICAL`/`MAJOR` review finding, or work required for the current task to be complete.
+- Do not use backlog to hide a missing acceptance criterion, unresolved `CRITICAL`/`MAJOR` review finding, or work required for the current task to be complete. The only exception is the explicit accepted-validation-limitation handoff below, which preserves the failed or blocked verdict rather than disguising it.
 - Do not implement an item merely because it was captured, listed, or inspected. Implementation requires a separate explicit request.
 - Treat the repository as read-only except for files under `docs/backlog/` and the narrow review-handoff edit described below.
 - Do not modify source, tests, configuration, brainstorms, or substantive plan text. During an accepted review handoff, modify only the source plan-review annotation or code-review finding being transferred and, when applicable, its review status. Do not commit or push.
@@ -90,6 +90,19 @@ When filing one:
 - for a code review, do not change `review_round`, because removing a transferred review finding does not alter implementation content.
 
 The backlog file is the sole durable record after a successful transfer. Do not leave a stub, tombstone, resolved block, or pointer in the source review artifact: that would retain the context clutter this handoff is intended to remove.
+
+## Accepted validation limitations
+
+A required acceptance criterion that is `FAIL` or `BLOCKED` may be captured as future backlog work only after the user has explicitly accepted closure with that limitation. This is a deferral record, not a review-finding transfer.
+
+Require all of the following:
+
+- the source `docs/reviews/*.md` artifact has `acceptance_status: accepted_with_limitations`;
+- its `## Human acceptance` section explicitly identifies the affected criterion and accepts closure despite that result;
+- the user explicitly asks to defer or backlog the remediation;
+- no unresolved `CRITICAL` or `MAJOR` code-review finding is being disguised as the validation limitation.
+
+Create or reuse a standalone backlog item using the ordinary add-item rules. Record the source review path, criterion ID, technical `validation_status`, decisive failure or blocker evidence, accepted limitation, deferral reason, and observable completion criteria. Do not remove or rewrite the criterion in the goal-validation block, change `validation_status`, or imply that acceptance made it pass. The validation artifact remains the durable evidence of the result; the backlog item records only the future remediation. If any prerequisite is missing or ambiguous, leave the validation artifact unchanged and ask for the missing decision.
 
 ## List items
 
