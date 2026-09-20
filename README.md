@@ -58,13 +58,13 @@ To make the skills repository-specific instead, copy the folders into `<reposito
 - The human controls transitions between phases.
 - Planning and review happen in separate sessions.
 - Review rounds are bounded; unresolved blockers eventually require a human decision.
-- Goal validation starts only after code review is `approved` or `approved-with-notes`, with no open blocking findings.
+- Goal validation starts only after code review is `approved` or `approved-with-notes`, with no unresolved blocking findings (`open` or `addressed`).
 - Code approval and external acceptance are separate.
 - Missing external evidence is `BLOCKED`, not an invented implementation defect.
 - Human acceptance never silently converts `FAIL` or `BLOCKED` into `PASS`.
-- Validation records technical status and explicit human acceptance as separate states.
+- Validation records technical status and explicit human acceptance as separate states. New or worsened failures or blockers require renewed acceptance; rejection always prevents closure.
 - A failed or blocked criterion may enter backlog only after explicit `accepted_with_limitations`; its validation evidence and verdict remain unchanged.
-- Before writing, wrap-up uses available session/task completion signals and rereads the authoritative artifacts so it does not close against stale evidence.
+- Before writing, wrap-up rereads the authoritative artifacts and uses available session statuses only as consistency signals. Ongoing artifact changes prevent closure; a stale `blocked` session status alone does not.
 - Deferred findings are removed from review context only after a verified backlog write.
 - Skills do not automatically commit, push, merge, deploy, or publish.
 - Secrets are never stored in workflow artifacts.

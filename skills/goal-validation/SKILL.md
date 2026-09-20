@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository read access, permission to run safe project checks, and permission to update only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.1.1"
+  version: "1.1.2"
 ---
 
 # Goal Validation
@@ -16,7 +16,7 @@ Independently demonstrate whether the current implementation achieves the plan's
 
 - Prefer a fresh session that did not implement the change. Regardless of session history, verify evidence directly instead of trusting summaries.
 - Validate the repository state that exists when invoked. Do not track or compare states between workflow stages; orchestration is external.
-- Treat source, tests, configuration, the plan, and review findings as read-only. Write only validation state and, when explicitly supplied, the human-acceptance decision in the selected `docs/reviews/*.md` artifact.
+- Treat source, tests, configuration, the plan, and review findings as read-only. Write only validation state, `acceptance_status`, and, when explicitly supplied, the human-acceptance decision in the selected `docs/reviews/*.md` artifact.
 - Safe tests, builds, linters, local execution, and read-only diagnostics are allowed. Do not deploy, mutate external systems, use credentials, or perform destructive checks without explicit authorization.
 - Do not edit implementation files, apply fixes, stage, commit, push, post comments, merge, create backlog items, or start another workflow stage.
 - Replace any secret or credential value in validation evidence with `[REDACTED]`.
@@ -35,7 +35,7 @@ It must identify the existing `docs/reviews/<task-slug>.md` created by code revi
 2. Read the complete review artifact and obtain its `plan` path.
 3. Read the complete plan plus applicable `AGENTS.md`, `CLAUDE.md`, README, contribution rules, and relevant product or operational documentation.
 4. Extract the original `Goal`, every `Acceptance criteria` item, every task-level `Done when`, `Final validation`, and relevant `Post-completion` actions.
-5. Require the code-review artifact's `review_status` to be `approved` or `approved-with-notes`, with no open `CRITICAL` or `MAJOR` findings. Otherwise stop and report that code review is not settled; do not write validation state. Read the remaining findings as context, but do not repeat code review.
+5. Require the code-review artifact's `review_status` to be `approved` or `approved-with-notes`, with no `open` or `addressed` `CRITICAL` or `MAJOR` findings. Otherwise stop and report that code review is not settled; do not write validation state. Read the remaining findings as context, but do not repeat code review.
 
 ## Validation scope
 
@@ -104,7 +104,7 @@ validation_status: passed | failed | blocked
 acceptance_status: not_recorded | accepted | accepted_with_limitations | rejected
 ```
 
-`validation_status` is the evidence-based technical verdict. `acceptance_status` records only the user's explicit product or iteration decision. Set it to `not_recorded` when no decision has been supplied, and preserve an existing explicit decision on later validation runs unless the user changes it. When migrating a legacy artifact, derive the field only from an explicit decision already recorded in its `## Human acceptance` section; otherwise use `not_recorded`.
+`validation_status` is the evidence-based technical verdict. `acceptance_status` records the user's explicit decision applicable to the current result; use `not_recorded` when none applies. Preserve the human-acceptance record. On later validation runs, retain `accepted`/`accepted_with_limitations` only if all current `FAIL`/`BLOCKED` results are covered by that decision. New or worsened failures or blockers require a new decision: set `acceptance_status` to `not_recorded` and explain what changed. Preserve `rejected` until the user changes it. For legacy artifacts, apply the same rules to the explicit decision in `## Human acceptance`; otherwise use `not_recorded`.
 
 Append one validation block at the end of the file. On a later run, replace the existing block between the markers instead of accumulating attempt history:
 
@@ -141,7 +141,7 @@ When the user explicitly supplies an acceptance decision, update `acceptance_sta
 - `accepted` — the user accepts an iteration whose validation passed and states no additional limitation;
 - `accepted_with_limitations` — the user accepts closure while validation is failed or blocked, or while explicitly acknowledging a waived or deferred limitation;
 - `rejected` — the user does not accept the iteration;
-- `not_recorded` — no explicit decision has been supplied.
+- `not_recorded` — no explicit decision applies to the current result.
 
 Record the decision and accepted scope, any explicitly accepted failed or blocked criteria, unexecuted checks, and deferred concerns. Do not infer waivers or acceptance from a vague positive comment. Preserve this record on later validation runs. Recording a decision does not authorize cleanup, implementation, commit, or publication.
 

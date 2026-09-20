@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires access to a Git repository and permission to edit docs/backlog/ plus remove accepted MINOR findings from their source review artifacts."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # Backlog
@@ -73,7 +73,7 @@ A `MINOR` finding marked `backlog_candidate: true` may become a backlog item onl
 
 When filing one:
 
-- require the source review to be complete with `review_status: approved-with-notes` or `approved`, and require no open `CRITICAL` or `MAJOR` findings;
+- require the source review to be complete with `review_status: approved-with-notes` or `approved`, and require no `open` or `addressed` `CRITICAL` or `MAJOR` findings;
 - for a plan review, also require `reviewed_revision` to equal `plan_revision`;
 - copy the finding's substance, not its review markup;
 - record the source artifact path and finding ID in `source`;
@@ -85,7 +85,7 @@ When filing one:
 - leave all surrounding plan content and unrelated review findings unchanged; verify that following validation/acceptance sections survive the transfer unchanged;
 - if the accepted finding was already represented by an existing backlog item, make sure that item preserves enough context to stand alone before removing the source finding;
 - if any backlog write or verification fails, leave the source finding intact and report the blocker. Do not delete or replace a conflicting existing file/directory to force a write; preserve it and request the missing decision.
-- after removing the finding, change `review_status: approved-with-notes` to `approved` only when no other open `MINOR` findings remain; otherwise keep `approved-with-notes`;
+- after removing the finding, change `review_status: approved-with-notes` to `approved` only when no other `open` or `addressed` `MINOR` findings remain; otherwise keep `approved-with-notes`;
 - for a plan review, do not increment `plan_revision` or change `reviewed_revision`, because removing a transferred annotation does not alter reviewed plan content;
 - for a code review, do not change `review_round`, because removing a transferred review finding does not alter implementation content.
 

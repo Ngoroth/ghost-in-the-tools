@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository read access and permission to edit only the selected plan Markdown file."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.0.2"
+  version: "1.0.3"
 ---
 
 # Plan Review
@@ -124,12 +124,14 @@ Rules:
 - `MAJOR`: a material omission or design problem must be corrected before implementation.
 - `MINOR`: optional improvement or deferred work that does not prevent safe implementation.
 
+For verdicts, an unresolved finding has status `open` or `addressed`. Only `resolved` findings are closed.
+
 After updating all findings, set review metadata:
 
-- No open `CRITICAL` or `MAJOR`, no open `MINOR`: `review_status: approved`.
-- No open `CRITICAL` or `MAJOR`, but open `MINOR`: `review_status: approved-with-notes`.
-- Open `CRITICAL` or `MAJOR`, before the final round: `review_status: needs-revision`.
-- Open `CRITICAL` or `MAJOR` at the final round: `review_status: needs-human-decision`.
+- No unresolved `CRITICAL` or `MAJOR`, no unresolved `MINOR`: `review_status: approved`.
+- No unresolved `CRITICAL` or `MAJOR`, but unresolved `MINOR`: `review_status: approved-with-notes`.
+- Unresolved `CRITICAL` or `MAJOR`, before the final round: `review_status: needs-revision`.
+- Unresolved `CRITICAL` or `MAJOR` at the final round: `review_status: needs-human-decision`.
 
 Always set `reviewed_revision` to the `plan_revision` that was reviewed.
 
@@ -143,7 +145,7 @@ After saving the annotations, report:
 
 - the exact repository-relative plan path;
 - the reviewed plan revision and review round;
-- counts of open findings by severity;
+- counts of unresolved findings by severity;
 - the resulting review status;
 - any `MINOR` findings marked as backlog candidates.
 

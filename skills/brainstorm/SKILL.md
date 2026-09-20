@@ -5,7 +5,7 @@ license: MIT
 compatibility: "OpenAI Codex; requires repository file access and preferably git."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.1.2"
+  version: "1.1.3"
 ---
 
 # Brainstorm
@@ -15,7 +15,7 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 ## Rules
 
 - Treat the repository as read-only until the final brainstorm record is written.
-- Ask exactly one meaningful question per message. Prefer 2-4 choices when useful and put the recommendation first.
+- Ask at most one question per message, only when its answer can materially change the design. Prefer 2-4 choices when useful and put the recommendation first.
 - Reuse information already provided; do not ask the user to repeat it.
 - Distinguish repository facts, agent recommendations, and user decisions.
 - Keep scope minimal and apply YAGNI.

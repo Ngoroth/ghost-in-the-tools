@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires Git repository read access, permission to run project checks, and permission to write only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Code Review
@@ -160,12 +160,14 @@ Rules:
 - `MAJOR`: material correctness, compatibility, scope, or test/validation-procedure defect in the implementation; not mere unavailability of external acceptance evidence.
 - `MINOR`: real optional improvement or independently useful deferred work.
 
+For verdicts, an unresolved finding has status `open` or `addressed`. Only `resolved` findings are closed.
+
 After inspecting the complete current change set, choose:
 
-- no open findings → `approved`;
-- only open `MINOR` → `approved-with-notes`;
-- open `CRITICAL`/`MAJOR` before Round 3 → `needs-fixes`;
-- open `CRITICAL`/`MAJOR` at Round 3 → `needs-human-decision`.
+- no unresolved findings → `approved`;
+- only unresolved `MINOR` → `approved-with-notes`;
+- unresolved `CRITICAL`/`MAJOR` before Round 3 → `needs-fixes`;
+- unresolved `CRITICAL`/`MAJOR` at Round 3 → `needs-human-decision`.
 
 `MINOR` findings never sustain another review round.
 
@@ -177,7 +179,7 @@ Do not automatically start another round. Wait until fixes are reported ready or
 
 Only an approved, non-blocking `MINOR` outside current acceptance scope may be transferred, and only after explicit user acceptance.
 
-The backlog skill writes and verifies one standalone item containing this review path, `CR-NNN`, evidence, impact, deferral reason, and `close_when`; only then it removes that finding section, preserving following independent sections, goal validation, and human acceptance. It changes `approved-with-notes` to `approved` only when no open `MINOR` remains. On failure, keep the finding. Leave no stub or pointer after successful transfer.
+The backlog skill writes and verifies one standalone item containing this review path, `CR-NNN`, evidence, impact, deferral reason, and `close_when`; only then it removes that finding section, preserving following independent sections, goal validation, and human acceptance. It changes `approved-with-notes` to `approved` only when no unresolved `MINOR` remains. On failure, keep the finding. Leave no stub or pointer after successful transfer.
 
 Never transfer `CRITICAL`, `MAJOR`, or work required by an acceptance criterion.
 
@@ -189,7 +191,7 @@ Report:
 
 - exact review artifact and plan paths;
 - plan revision, base ref/SHA, round, and status;
-- open finding counts by severity;
+- unresolved finding counts by severity;
 - commands actually run and their outcomes;
 - incomplete verification or external evidence still needed;
 - `MINOR` backlog candidates.
