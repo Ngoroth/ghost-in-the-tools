@@ -5,7 +5,7 @@ license: MIT
 compatibility: "OpenAI Codex; requires repository file access and preferably git."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # Planning
@@ -92,6 +92,8 @@ For every code-changing task, include tests or explain why no automated test app
 Task-level `Done when` describes completion of that implementation unit and its repository-local verification. Put required device checks, external-system checks, and human judgments in a separate part of `Final validation`, with their prerequisite and evidence needed; do not repeat the same external blocker inside every task. These checks remain required for overall acceptance unless the user explicitly decides otherwise.
 
 Use short identifiers for acceptance criteria and final checks. Reference them rather than restating the same requirement in multiple sections. Carry the agreed quality level, UI/language decisions, and representative quality examples into observable criteria; do not equate a successful build with acceptable usability or output quality.
+
+When implementation or verification involves substantial resource use or repeated operations, record the cost considerations in the relevant plan sections: affected components and dependencies, downloads, storage or compute needs, paid resources when applicable, and maintenance burden. Identify one-time preparation, reusable inputs, operations that must run fresh, and the changes that require checks to be repeated. Reuse the approved brainstorm decisions. Do not estimate implementation or execution time. Distinguish known facts from estimates and explain material uncertainty; do not run expensive experiments solely to estimate costs. Small changes do not need a separate cost section.
 
 Use this structure:
 

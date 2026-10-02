@@ -5,7 +5,7 @@ license: MIT
 compatibility: "OpenAI Codex; requires repository file access and preferably git."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.1.3"
+  version: "1.1.4"
 ---
 
 # Brainstorm
@@ -15,6 +15,7 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 ## Rules
 
 - Treat the repository as read-only until the final brainstorm record is written.
+- Use plain language in the user dialogue. Explain proposals through what the user will do, what result they will get, and the consequences of each choice. Use technical terms only when needed to make a decision, and briefly explain them. Make questions answerable without knowing the project's internal architecture.
 - Ask at most one question per message, only when its answer can materially change the design. Prefer 2-4 choices when useful and put the recommendation first.
 - Reuse information already provided; do not ask the user to repeat it.
 - Distinguish repository facts, agent recommendations, and user decisions.
@@ -41,12 +42,14 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 
 1. Present 2-3 genuinely different approaches when alternatives exist.
 2. Lead with the recommended approach and explain why it best fits the constraints.
-3. Summarize the meaningful benefits, costs, and risks of each option.
+3. Summarize the meaningful benefits, costs, and risks of each option. When costs affect the choice, describe the scope of changes, dependencies, resource needs, recurring operations, and maintenance burden. Distinguish one-time preparation from work repeated on each use, and identify what can be reused. Do not estimate implementation or execution time. State the basis and uncertainty of any quantitative resource or monetary estimate; do not invent precision or run expensive experiments solely to produce an estimate.
 4. Let the user select, combine, or reject them. Never treat a recommendation as an approved decision.
 
 ### 4. Validate the design
 
 Present one short, coherent section at a time and confirm it before continuing. Cover only relevant areas, such as components, flows, contracts, persistence, failures, security, observability, testing, and rollout.
+
+Each section should explain a coherent design decision and its practical consequences. State exactly what the user is being asked to confirm. Do not split a connected decision into trivial confirmations or ask again about an already approved decision unless new evidence changes it.
 
 Track approved decisions, rejected alternatives and reasons, risks, and open questions. Backtrack when the user corrects an assumption.
 
@@ -60,7 +63,7 @@ The brainstorm is complete only when the user explicitly approves the overall de
 3. Use the user's local date and time when available. Use a short lowercase ASCII kebab-case slug.
 4. Never overwrite an unrelated file; append `-2`, `-3`, and so on when needed.
 5. Write in the brainstorm's language and preserve technical identifiers exactly.
-6. Save the settled result and rationale, not a transcript.
+6. Save the settled result and rationale, not a transcript. Preserve any material cost and reuse tradeoffs discussed with the user.
 7. If the same conversation continues the same brainstorm, update the same file and add or refresh `Updated`. A separate topic gets a new file.
 
 Use this compact structure:
