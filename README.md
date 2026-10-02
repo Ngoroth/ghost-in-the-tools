@@ -24,6 +24,7 @@ Implementation intentionally has no dedicated skill. The developer remains respo
 
 ## Skills
 
+- **`workflow-guide`** — explains how to choose and combine this skill set, checks stage prerequisites, and prepares context for another session without depending on an orchestration tool.
 - **`brainstorm`** — turns a rough idea into an approved, repository-grounded design and saves it under `docs/brainstorm/`.
 - **`planning`** — creates an executable implementation plan with observable completion criteria under `docs/plans/`.
 - **`plan-review`** — independently reviews a plan in place, using bounded review rounds.
@@ -50,6 +51,8 @@ Copy-Item -Recurse -Force ".\skills\*" "$HOME\.agents\skills\"
 ```
 
 Codex detects skills automatically. If they do not appear, restart Codex. Invoke one explicitly with `$brainstorm`, `$planning`, `$plan-review`, and so on.
+
+Use `$workflow-guide` to navigate the set, for example: “Which skill should I use next for `docs/plans/<plan>.md`, and what context does the next session need?” The guide describes the workflow and its handoffs; session launch and orchestration remain external.
 
 To make the skills repository-specific instead, copy the folders into `<repository>/.agents/skills/`.
 
