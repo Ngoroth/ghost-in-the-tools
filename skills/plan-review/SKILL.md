@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository read access and permission to edit only the selected plan Markdown file."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.0.3"
+  version: "2.0.2"
 ---
 
 # Plan Review
@@ -16,6 +16,7 @@ Independently verify that an implementation plan is correct, repository-grounded
 
 - Use this skill in a session that did not create or substantively revise the plan. If this session authored the plan, stop and request review in a separate session.
 - Prefer one reviewer session for the plan's full review lifecycle. A replacement reviewer must continue the recorded rounds and finding IDs rather than restart from zero.
+- Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer that authority; report missing responsibility or decisions and reuse applicable decisions already supplied. The independent reviewer retains ownership of findings and technical verdicts.
 - Treat the repository as read-only except for the selected `docs/plans/*.md` file.
 - In that file, modify only review metadata and `PLAN-REVIEW` comment blocks. Never rewrite the plan's substantive content.
 - Do not modify source, tests, configuration, brainstorm records, or backlog files. Do not commit, push, or implement.
@@ -52,9 +53,9 @@ If a legacy plan has no review metadata, add these fields without replacing unre
 
 Before reviewing:
 
-- If `review_status` is `approved` or `approved-with-notes` and `reviewed_revision` equals `plan_revision`, report that the current revision is already approved and stop unless the user explicitly requests another review.
-- If `review_status` is `needs-human-decision`, stop and report the unresolved findings. Do not start a fourth round.
-- If `review_round` already equals `max_review_rounds` and blocking findings remain, set `review_status: needs-human-decision` and stop.
+- If `review_status` is `approved` or `approved-with-notes` and `reviewed_revision` equals `plan_revision`, report that the current revision is already approved and stop unless another review is explicitly authorized by the responsible party.
+- If `review_status` is `needs-decision`, stop and report the unresolved findings to the responsible party. Do not exceed `max_review_rounds`.
+- If `review_round >= max_review_rounds`, do not increment the counter or start another round. If blocking findings remain, set `review_status` to `needs-decision`. Report that the review limit has been reached. Continuing requires an explicit decision from the responsible party and an updated `max_review_rounds`; do not reset `review_round`.
 - Otherwise increment `review_round` by one. Never exceed `max_review_rounds`.
 
 ## Review depth by round
@@ -63,7 +64,7 @@ Before reviewing:
 
 Review the whole plan against the checklist below. Consolidate overlapping findings and report only concrete, actionable problems.
 
-### Rounds 2 and 3: convergence review
+### Subsequent permitted rounds: convergence review
 
 Do not restart the review from scratch. Check only:
 
@@ -82,7 +83,7 @@ Check only relevant dimensions:
 - **Repository grounding:** referenced paths, symbols, patterns, dependencies, and commands exist or are explicitly identified as assumptions or discovery steps.
 - **Executability:** tasks are ordered, bounded, and contain observable `Done when` criteria; the implementer does not have to infer completion.
 - **Correctness and completeness:** relevant failures, edge cases, compatibility, migrations, rollout, rollback, security, observability, and external actions are covered.
-- **Testing:** verification matches the repository and the changed behavior, including relevant failure paths. Repository task completion is separate from required external/human acceptance checks; each external check has an explicit prerequisite and observable evidence. Preserve the agreed quality level without adding unrequested polish or moving required acceptance out of scope.
+- **Testing:** verification matches the repository and the changed behavior, including relevant failure paths. Repository task completion is separate from required external acceptance checks; each external check has an explicit prerequisite and observable evidence, including a human observer when the requirement explicitly calls for one. Preserve the agreed quality level without adding unrequested polish or moving required acceptance out of scope.
 - **Scope and simplicity:** no unrelated cleanup, speculative flexibility, premature abstraction, or avoidable coupling.
 
 Do not block on personal style preferences, harmless naming choices, optional refactoring, hypothetical future requirements, or details the implementer can safely determine locally.
@@ -116,7 +117,7 @@ Rules:
 - Do not delete findings during the active review cycle. After the current plan revision reaches `approved` or `approved-with-notes`, the backlog skill may remove an explicitly accepted `MINOR` backlog candidate, but only after its backlog file has been written successfully.
 - Reopen a resolved finding only when new evidence shows its `close_when` condition is no longer met.
 - Set `backlog_candidate: true` only for a real, non-blocking `MINOR` item outside the current plan's required scope. Never defer a current acceptance criterion or a `CRITICAL`/`MAJOR` issue to backlog.
-- Do not create backlog files during review. After review, the user or planner may invoke the backlog skill for selected candidates. That skill preserves the finding in a standalone backlog file and then removes its complete `PLAN-REVIEW` block from the plan so deferred work does not consume plan context.
+- Do not create backlog files during review. After review, an authorized participant may invoke the backlog skill for selected candidates. That skill preserves the finding in a standalone backlog file and then removes its complete `PLAN-REVIEW` block from the plan so deferred work does not consume plan context.
 
 ## Severity and verdict
 
@@ -131,7 +132,7 @@ After updating all findings, set review metadata:
 - No unresolved `CRITICAL` or `MAJOR`, no unresolved `MINOR`: `review_status: approved`.
 - No unresolved `CRITICAL` or `MAJOR`, but unresolved `MINOR`: `review_status: approved-with-notes`.
 - Unresolved `CRITICAL` or `MAJOR`, before the final round: `review_status: needs-revision`.
-- Unresolved `CRITICAL` or `MAJOR` at the final round: `review_status: needs-human-decision`.
+- Unresolved `CRITICAL` or `MAJOR` at the final round: `review_status: needs-decision`.
 
 Always set `reviewed_revision` to the `plan_revision` that was reviewed.
 
@@ -149,4 +150,4 @@ After saving the annotations, report:
 - the resulting review status;
 - any `MINOR` findings marked as backlog candidates.
 
-If the result is `needs-human-decision`, list the precise unresolved choices or evidence needed. Do not launch another review, revise the plan, create backlog entries, or begin implementation.
+If the result is `needs-decision`, list the precise unresolved choices or evidence needed for the responsible party. Do not launch another review, revise the plan, create backlog entries, or begin implementation.

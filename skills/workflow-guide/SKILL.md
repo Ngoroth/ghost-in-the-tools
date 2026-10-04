@@ -4,7 +4,7 @@ description: "Use to explain, select, or sequence the Ghost in the Tools skills,
 license: MIT
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # Workflow Guide
@@ -19,6 +19,16 @@ Read the selected skill's full `SKILL.md` before using it. The links below locat
 
 The guide itself does not edit workflow artifacts or start other sessions. When execution is requested, apply the selected skill within the user's authorized scope. An explanation or next-step recommendation does not authorize execution of the whole sequence. Preserve decisions and authorization already supplied; ask only for a missing decision that affects the next action.
 
+## Decision responsibility
+
+Every required decision has a responsible party, determined by the user's chosen process or the supplied task context. Skills do not prescribe whether that party is a person or an automated participant; executing a skill does not itself confer decision authority.
+
+Use decisions and authorization already supplied within their stated scope. Do not request the same decision again unless new evidence invalidates it or changes its scope.
+
+When a required decision or its responsible party is unknown, report what is missing rather than inventing approval. No participant registry or particular coordination mechanism is required.
+
+Decision authority does not replace technical evidence, reviewer independence, or permissions imposed by the execution environment.
+
 ## Select a skill
 
 | Need | Skill | Input and durable result |
@@ -27,9 +37,9 @@ The guide itself does not edit workflow artifacts or start other sessions. When 
 | Turn a settled approach into executable tasks | [planning](../planning/SKILL.md) | Settled scope, decisions, and optional brainstorm → one plan with observable completion criteria in `docs/plans/`. |
 | Independently check a plan before implementation | [plan-review](../plan-review/SKILL.md) | Explicit plan path → review metadata and inline `PLAN-REVIEW` findings in that plan. |
 | Independently check implemented changes | [code-review](../code-review/SKILL.md) | Explicit approved plan path and unambiguous Git scope → one continuing evidence artifact in `docs/reviews/`. |
-| Demonstrate that the goal and required criteria are met | [goal-validation](../goal-validation/SKILL.md) | Explicit code-review artifact path → technical validation and separately recorded human acceptance in that artifact. |
+| Demonstrate that the goal and required criteria are met | [goal-validation](../goal-validation/SKILL.md) | Explicit code-review artifact path → technical validation and separately recorded acceptance in that artifact. |
 | Capture, list, inspect, or close deferred work | [backlog](../backlog/SKILL.md) | Requested operation and task or accepted finding → standalone items in `docs/backlog/`. Listing and inspection do not authorize implementation. |
-| Close an iteration and preserve its evidence | [wrap-up](../wrap-up/SKILL.md) | Selected plan, review/validation evidence, and supplied user decision → closing section, agreed follow-ups, and archival when closure conditions hold. |
+| Close an iteration and preserve its evidence | [wrap-up](../wrap-up/SKILL.md) | Selected plan, review/validation evidence, and supplied acceptance decision → closing section, agreed follow-ups, and archival when closure conditions hold. |
 | Explain the current session's result | [session-work-summary](../session-work-summary/SKILL.md) | Available conversation and tool evidence → concise chat summary, without new checks or file changes. |
 
 Implementation and fixes have no dedicated skill in this set. They are ordinary development work under the user's request and the approved plan; neither a reviewer nor this guide takes ownership of them implicitly.
@@ -39,18 +49,18 @@ Implementation and fixes have no dedicated skill in this set. They are ordinary 
 The full iteration follows this shape:
 
 ```text
-brainstorm → planning → independent plan-review → human approval
+brainstorm → planning → independent plan-review → implementation authorization
 → implementation → independent code-review → goal-validation
-→ human acceptance → wrap-up
+→ acceptance → wrap-up
 ```
 
 Enter where the request and existing evidence place the task. A settled design need not be brainstormed again. A summary or backlog operation can stand alone. Do not impose the full iteration on every request, or skip a selected skill's prerequisites because an earlier stage was omitted.
 
 - **Design to plan:** material decisions must be settled before planning writes a plan. Return connected design questions to brainstorm; do not hide them in implementation tasks.
-- **Plan to implementation:** plan review must approve the current revision (`approved` or `approved-with-notes`, with `reviewed_revision` equal to `plan_revision`). Technical approval and the user's authorization to implement are separate. A substantive revision invalidates the previous review approval under the planning rules.
-- **Review and fixes:** `needs-revision` routes to the plan author; `needs-fixes` routes to the implementer. They may mark findings `addressed`; only the independent reviewer can mark them `resolved`. Both `open` and `addressed` findings remain unresolved. Continue the same artifacts, finding IDs, and bounded review rounds. `MINOR` findings do not require another round. At `needs-human-decision`, surface the exact unresolved choice; do not reset counters or create a new artifact to bypass the limit.
+- **Plan to implementation:** plan review must approve the current revision (`approved` or `approved-with-notes`, with `reviewed_revision` equal to `plan_revision`). Technical approval and implementation authorization from the responsible party are separate; authorization may already have been supplied for this scope. A substantive revision invalidates the previous review approval under the planning rules.
+- **Review and fixes:** `needs-revision` routes to the plan author; `needs-fixes` routes to the implementer. They may mark findings `addressed`; only the independent reviewer can mark them `resolved`. Both `open` and `addressed` findings remain unresolved. Continue the same artifacts, finding IDs, and bounded review rounds. `MINOR` findings do not require another round. At `needs-decision`, surface the exact unresolved choice to the responsible party; do not reset counters or create a new artifact to bypass the limit.
 - **Code review to validation:** require `approved` or `approved-with-notes` and no unresolved `CRITICAL` or `MAJOR` findings. Missing external evidence alone is incomplete verification, not an implementation defect; validation determines its effect on acceptance criteria.
-- **Validation to acceptance:** `PASS`, `FAIL`, and `BLOCKED` describe evidence for each criterion. The aggregate technical status (`passed`, `failed`, or `blocked`) is separate from `acceptance_status` (`not_recorded`, `accepted`, `accepted_with_limitations`, or `rejected`). Acceptance cannot turn an unexecuted or failing check into a pass. New or worsened limitations require a decision covering them. Report failures or missing evidence so the user can choose the next step; validation does not launch fixes.
+- **Validation to acceptance:** `PASS`, `FAIL`, and `BLOCKED` describe evidence for each criterion. The aggregate technical status (`passed`, `failed`, or `blocked`) is separate from `acceptance_status` (`not_recorded`, `accepted`, `accepted_with_limitations`, or `rejected`). Acceptance cannot turn an unexecuted or failing check into a pass. New or worsened limitations require a decision covering them. Report failures or missing evidence so the responsible party can decide the next step; validation does not launch fixes.
 - **Acceptance to closure:** use wrap-up's closure rules and reread the authoritative artifacts before writing. Rejection prevents archival; failed or blocked criteria require explicit acceptance covering every current limitation. Invoking wrap-up is not itself acceptance. Keep review and validation evidence when archiving the plan.
 
 Publication is outside this sequence: none of these skills automatically stages, commits, pushes, merges, deploys, or publishes.
@@ -63,7 +73,7 @@ Session creation, scheduling, messages, and transport belong to the surrounding 
 
 - requested stage and companion skill;
 - repository location and explicit repository-relative artifact paths;
-- goal, settled constraints, and relevant user decisions or authorization;
+- goal, settled constraints, applicable decisions or authorization, and the responsible party for any pending decision;
 - for code review, the known base ref or starting SHA and scope boundaries;
 - current revision, review round, unresolved finding IDs, and exact missing prerequisites when applicable;
 - permitted writes and expected result or stopping condition, as defined by the selected skill.

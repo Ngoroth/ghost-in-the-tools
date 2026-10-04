@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires Git repository read access, permission to run project checks, and permission to write only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.1.1"
+  version: "2.0.2"
 ---
 
 # Code Review
@@ -17,6 +17,7 @@ Independently review an implementation against its approved plan, exact Git scop
 - Run in a fresh session that did not implement the change. If this session authored or substantially edited it, stop and request another reviewer session.
 - Session launch and communication are external. This skill uses repository artifacts and does not depend on a terminal manager, subagent system, or transport.
 - Review the repository state that exists when invoked. Do not track or police changes made between workflow stages; session orchestration is external.
+- Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer that authority; report missing responsibility or decisions and reuse applicable decisions already supplied. The independent reviewer retains ownership of findings and technical verdicts.
 - Treat source, tests, configuration, plans, and backlog files as read-only. Write only the selected `docs/reviews/*.md` artifact.
 - Relevant tests, builds, linters, and read-only diagnostics are allowed. Do not run deployments, destructive commands, external writes, or credentialed checks without explicit authorization.
 - Do not edit source, apply fixes, stage files, commit, push, post comments, merge, switch branches, or create worktrees.
@@ -75,13 +76,13 @@ review_status: pending
 
 Preserve unrelated frontmatter.
 
-The artifact is workflow evidence. This skill may create and update it, but must not stage, commit, push, or publish it. Preserve it through goal validation and wrap-up. Wrap-up keeps it as evidence and repairs its plan reference when the plan is archived; delete it only on a separate explicit user request.
+The artifact is workflow evidence. This skill may create and update it, but must not stage, commit, push, or publish it. Preserve it through goal validation and wrap-up. Wrap-up keeps it as evidence and repairs its plan reference when the plan is archived; delete it only on a separate explicit request authorized by the responsible party.
 
 Before a round:
 
 - Rebuild the complete current change set from Git and untracked files; do not rely on the implementation session's summary.
-- If status is `needs-human-decision`, report the unresolved blockers and stop unless the user resolves them and explicitly authorizes another bounded cycle.
-- If `review_round` equals `max_review_rounds` and blockers remain, set `needs-human-decision` and stop.
+- If status is `needs-decision`, report the unresolved blockers to the responsible party and stop unless that party resolves them and explicitly authorizes another bounded cycle.
+- If `review_round >= max_review_rounds`, do not increment the counter or start another round. If blocking findings remain, set `review_status` to `needs-decision`. Report that the review limit has been reached. Continuing requires an explicit decision from the responsible party and an updated `max_review_rounds`; do not reset `review_round`.
 - Otherwise increment `review_round` once. Never exceed the cap automatically.
 
 ## Review procedure
@@ -115,7 +116,7 @@ A suspicion is not a finding. Before recording it:
 
 Drop style preferences, generic advice, speculative risks, unchanged pre-existing issues, optional cleanup disguised as correctness, and claims contradicted by repository conventions or actual results.
 
-### Rounds 2 and 3: convergence review
+### Subsequent permitted rounds: convergence review
 
 Do not restart a full review. Check only:
 
@@ -162,24 +163,26 @@ Rules:
 
 For verdicts, an unresolved finding has status `open` or `addressed`. Only `resolved` findings are closed.
 
+The final permitted round is defined by `max_review_rounds`.
+
 After inspecting the complete current change set, choose:
 
 - no unresolved findings → `approved`;
 - only unresolved `MINOR` → `approved-with-notes`;
-- unresolved `CRITICAL`/`MAJOR` before Round 3 → `needs-fixes`;
-- unresolved `CRITICAL`/`MAJOR` at Round 3 → `needs-human-decision`.
+- unresolved `CRITICAL`/`MAJOR` before the final permitted round → `needs-fixes`;
+- unresolved `CRITICAL`/`MAJOR` at the final permitted round → `needs-decision`.
 
 `MINOR` findings never sustain another review round.
 
 The implementation session owns source changes and may mark findings `addressed`; it cannot resolve or approve them. The reviewer owns re-verification, `resolved` or reopened status, rounds, and verdict. Prefer the same reviewer session across rounds; a replacement continues the artifact and IDs.
 
-Do not automatically start another round. Wait until fixes are reported ready or the user explicitly requests it.
+Do not automatically start another round. Wait until fixes are reported ready or another review is explicitly authorized by the responsible party.
 
 ## Backlog handoff
 
-Only an approved, non-blocking `MINOR` outside current acceptance scope may be transferred, and only after explicit user acceptance.
+Only an approved, non-blocking `MINOR` outside current acceptance scope may be transferred, and only after explicit acceptance by the responsible party.
 
-The backlog skill writes and verifies one standalone item containing this review path, `CR-NNN`, evidence, impact, deferral reason, and `close_when`; only then it removes that finding section, preserving following independent sections, goal validation, and human acceptance. It changes `approved-with-notes` to `approved` only when no unresolved `MINOR` remains. On failure, keep the finding. Leave no stub or pointer after successful transfer.
+The backlog skill writes and verifies one standalone item containing this review path, `CR-NNN`, evidence, impact, deferral reason, and `close_when`; only then it removes that finding section, preserving following independent sections, goal validation, and acceptance. It changes `approved-with-notes` to `approved` only when no unresolved `MINOR` remains. On failure, keep the finding. Leave no stub or pointer after successful transfer.
 
 Never transfer `CRITICAL`, `MAJOR`, or work required by an acceptance criterion.
 
@@ -196,4 +199,4 @@ Report:
 - incomplete verification or external evidence still needed;
 - `MINOR` backlog candidates.
 
-If status is `needs-human-decision`, list the exact unresolved risks or evidence. Do not fix code, start another round, create backlog items, run final goal validation, or wrap up.
+If status is `needs-decision`, list the exact unresolved risks or evidence for the responsible party. Do not fix code, start another round, create backlog items, run final goal validation, or wrap up.

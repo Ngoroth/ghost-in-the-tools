@@ -5,7 +5,7 @@ license: MIT
 compatibility: "OpenAI Codex; requires repository file access and preferably git."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.2.1"
+  version: "2.0.0"
 ---
 
 # Planning
@@ -15,15 +15,16 @@ Create a concrete implementation plan grounded in the current repository. Planni
 ## Rules
 
 - Treat the repository as read-only except for the final plan file under `docs/plans/`.
+- Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer that authority; report missing responsibility or decisions and reuse applicable decisions already supplied.
 - Reuse approved decisions from the conversation and any relevant brainstorm record. Do not reopen settled questions without new evidence.
 - Ask exactly one meaningful question per message and only when the answer can change the plan.
 - Write a plan only after every material decision that can change its scope, approach, task graph, dependencies, compatibility, failure behavior, or acceptance criteria is settled. Do not use the plan to make those decisions later.
 - A plan must be linear and executable as written. Do not include alternative approaches, `TBD`, "choose during implementation", decision gates, or conditional task branches whose outcome changes downstream implementation.
-- Distinguish repository facts, agent recommendations, assumptions, and user decisions.
+- Distinguish repository facts, agent recommendations, assumptions, and decisions from the responsible party.
 - Prefer the smallest solution that satisfies the acceptance criteria. Apply YAGNI and avoid premature abstraction.
 - Never require the implementer to guess when work is complete. Give every task explicit, observable completion criteria.
 - Keep plan authorship separate from review: the planning session changes plan content, while an independent review session changes only review metadata and `PLAN-REVIEW` annotations.
-- Do not modify source, tests, or configuration. Do not commit, push, or implement unless separately requested after the plan is saved.
+- Do not modify source, tests, or configuration. Do not commit, push, or implement under this skill; subsequent work requires applicable authorization from the responsible party.
 
 ## Workflow
 
@@ -53,9 +54,9 @@ Before writing, confirm that the selected scope and approach already determine:
 - compatibility, migration, persistence, security, privacy, and failure behavior where relevant;
 - rollout, rollback, external prerequisites, verification strategy, and the observable quality bar.
 
-Resolve a single isolated gap by asking the user one focused question. When several connected decisions remain, alternatives require design tradeoffs, or feasibility evidence is missing, recommend `$brainstorm` and stop without creating a plan. State exactly which decisions or evidence the brainstorm must settle.
+Resolve a single isolated gap by asking the responsible party one focused question. When several connected decisions remain, alternatives require design tradeoffs, or feasibility evidence is missing, recommend `$brainstorm` and stop without creating a plan. State exactly which decisions or evidence the brainstorm must settle.
 
-If the user intentionally defers a material decision, do not move it into the plan. Explain that planning is blocked until the decision is made or the undecided work is removed from the plan's scope.
+If the responsible party intentionally defers a material decision, do not move it into the plan. Explain that planning is blocked until the decision is made or the undecided work is removed from the plan's scope.
 
 ### 3. Select the approach
 
@@ -65,9 +66,9 @@ Otherwise, when meaningful alternatives exist:
 
 1. Present 2-3 genuinely different approaches.
 2. Lead with the recommendation and summarize benefits, costs, and risks.
-3. Let the user select, combine, or reject them before writing the final plan.
+3. Obtain the approach decision from the responsible party, who may select, combine, or reject the options. Use an already supplied decision when applicable before writing the final plan.
 
-Skip artificial alternatives when there is one clear path or the user already specified the implementation method.
+Skip artificial alternatives when there is one clear path or an applicable decision already specifies the implementation method.
 
 Do not save a plan until one approach is selected and every material consequence for the task graph and acceptance criteria is resolved. Repository inspection may establish facts, but implementation must not be tasked with discovering which architecture, dependency, provider, model, schema, migration strategy, or product behavior the plan should use.
 
@@ -89,7 +90,7 @@ Tasks may describe already-decided runtime behavior such as error handling, retr
 
 For every code-changing task, include tests or explain why no automated test applies. Keep manual or external actions separate from repository implementation tasks.
 
-Task-level `Done when` describes completion of that implementation unit and its repository-local verification. Put required device checks, external-system checks, and human judgments in a separate part of `Final validation`, with their prerequisite and evidence needed; do not repeat the same external blocker inside every task. These checks remain required for overall acceptance unless the user explicitly decides otherwise.
+Task-level `Done when` describes completion of that implementation unit and its repository-local verification. Put required device checks, external-system checks, and explicitly required human judgments in a separate part of `Final validation`, with their prerequisite and evidence needed; do not repeat the same external blocker inside every task. These checks remain required for overall acceptance unless the responsible party explicitly decides otherwise.
 
 Use short identifiers for acceptance criteria and final checks. Reference them rather than restating the same requirement in multiple sections. Carry the agreed quality level, UI/language decisions, and representative quality examples into observable criteria; do not equate a successful build with acceptable usability or output quality.
 
@@ -151,7 +152,7 @@ reviewed_revision: null
 - [ ] verify every acceptance criterion
 - [ ] review the final diff for scope and regressions
 
-### Required external or human checks (when applicable)
+### Required external or explicitly human checks (when applicable)
 - [ ] <ID>: <observable outcome> — prerequisite: <device/access/person>; evidence: <observation or record>
 
 ## Risks and mitigations
@@ -175,9 +176,9 @@ When revising a plan that contains `PLAN-REVIEW` findings:
 4. Increment `plan_revision` exactly once for the revision pass, regardless of how many findings were addressed.
 5. Set `review_status: pending` and `reviewed_revision: null`. Do not change `review_round`; the reviewer owns that counter.
 6. A substantive edit after `approved` or `approved-with-notes` invalidates approval in the same way.
-7. Never defer a current acceptance criterion or an open `CRITICAL`/`MAJOR` finding to backlog. After the current revision is approved, a non-blocking `MINOR` marked `backlog_candidate: true` may be filed with the backlog skill only after explicit user approval. Once the backlog file is safely written, that skill removes the complete finding block from the plan so deferred work no longer consumes plan context.
+7. Never defer a current acceptance criterion or an open `CRITICAL`/`MAJOR` finding to backlog. After the current revision is approved, a non-blocking `MINOR` marked `backlog_candidate: true` may be filed with the backlog skill only after explicit approval from the responsible party. Once the backlog file is safely written, that skill removes the complete finding block from the plan so deferred work no longer consumes plan context.
 
-Review annotations alone do not increment `plan_revision`. If `review_status` is `needs-human-decision`, obtain the required human decision before another substantive revision or review attempt.
+Review annotations alone do not increment `plan_revision`. If `review_status` is `needs-decision`, obtain the required decision from the responsible party before another substantive revision or review attempt.
 
 ### 6. Review and report
 

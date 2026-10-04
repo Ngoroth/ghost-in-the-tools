@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires access to a Git repository and permission to edit docs/backlog/ plus remove accepted MINOR findings from their source review artifacts."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.3.1"
+  version: "2.0.0"
 ---
 
 # Backlog
@@ -15,6 +15,7 @@ Maintain a small repository-local backlog under `docs/backlog/`. Each file repre
 ## Rules
 
 - Store one task per Markdown file: `docs/backlog/<task-slug>.md`.
+- Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer that authority; report missing responsibility or decisions and reuse applicable decisions already supplied.
 - A backlog item never gates the current plan or implementation.
 - Do not use backlog to hide a missing acceptance criterion, unresolved `CRITICAL`/`MAJOR` review finding, or work required for the current task to be complete. The only exception is the explicit accepted-validation-limitation handoff below, which preserves the failed or blocked verdict rather than disguising it.
 - Do not implement an item merely because it was captured, listed, or inspected. Implementation requires a separate explicit request.
@@ -30,7 +31,7 @@ Use paths relative to that root. Do not switch branches, create worktrees, or mo
 
 ## Add an item
 
-When the user explicitly asks to add deferred work, or explicitly accepts a backlog candidate from review:
+When the responsible party explicitly requests deferred work or accepts a backlog candidate from review:
 
 1. Confirm that the item is real, actionable, and outside the current task's required scope.
 2. If the request contains multiple independent tasks, create one file for each. Do not bundle them.
@@ -47,7 +48,7 @@ Use this format:
 ```markdown
 ---
 added: YYYY-MM-DD
-source: <repository-relative review artifact and finding ID, issue, or user request; omit if unavailable>
+source: <repository-relative review artifact and finding ID, issue, or authorized request; omit if unavailable>
 where: <repository-relative path[:line] or symbol; omit if not anchored>
 ---
 # <Concrete task title>
@@ -66,7 +67,7 @@ Omit optional frontmatter fields rather than inventing values. Preserve exact id
 
 ## Review findings
 
-A `MINOR` finding marked `backlog_candidate: true` may become a backlog item only when the user explicitly accepts it. Supported sources are:
+A `MINOR` finding marked `backlog_candidate: true` may become a backlog item only when the responsible party explicitly accepts it. Supported sources are:
 
 - a `PR-NNN` `PLAN-REVIEW` block in an approved plan;
 - a `CR-NNN` finding section in an approved code-review artifact under `docs/reviews/`.
@@ -81,7 +82,7 @@ When filing one:
 - create one backlog file per accepted finding;
 - never file current-scope `CRITICAL` or `MAJOR` findings;
 - write or update the backlog item first and verify that the complete deferred task is preserved there;
-- only after that write succeeds, remove the finding completely from its source: the entire `PLAN-REVIEW` comment block for `PR-NNN`, or the selected `## CR-NNN` section only for `CR-NNN`. Its boundary is the earliest subsequent same-or-higher-level Markdown heading (whether a finding or another section), `<!-- GOAL-VALIDATION:START -->`, or end of file. Preserve the boundary and all following content, especially goal validation and human acceptance. If the section boundary is ambiguous, stop without deleting;
+- only after that write succeeds, remove the finding completely from its source: the entire `PLAN-REVIEW` comment block for `PR-NNN`, or the selected `## CR-NNN` section only for `CR-NNN`. Its boundary is the earliest subsequent same-or-higher-level Markdown heading (whether a finding or another section), `<!-- GOAL-VALIDATION:START -->`, or end of file. Preserve the boundary and all following content, especially goal validation and acceptance. If the section boundary is ambiguous, stop without deleting;
 - leave all surrounding plan content and unrelated review findings unchanged; verify that following validation/acceptance sections survive the transfer unchanged;
 - if the accepted finding was already represented by an existing backlog item, make sure that item preserves enough context to stand alone before removing the source finding;
 - if any backlog write or verification fails, leave the source finding intact and report the blocker. Do not delete or replace a conflicting existing file/directory to force a write; preserve it and request the missing decision.
@@ -93,13 +94,13 @@ The backlog file is the sole durable record after a successful transfer. Do not 
 
 ## Accepted validation limitations
 
-A required acceptance criterion that is `FAIL` or `BLOCKED` may be captured as future backlog work only after the user has explicitly accepted closure with that limitation. This is a deferral record, not a review-finding transfer.
+A required acceptance criterion that is `FAIL` or `BLOCKED` may be captured as future backlog work only after the responsible party has explicitly accepted closure with that limitation. This is a deferral record, not a review-finding transfer.
 
 Require all of the following:
 
 - the source `docs/reviews/*.md` artifact has `acceptance_status: accepted_with_limitations`;
-- its `## Human acceptance` section explicitly identifies the affected criterion and accepts closure despite that result;
-- the user explicitly asks to defer or backlog the remediation;
+- its `## Acceptance` section explicitly identifies the affected criterion and accepts closure despite that result;
+- the responsible party explicitly requests deferring or backlogging the remediation;
 - no unresolved `CRITICAL` or `MAJOR` code-review finding is being disguised as the validation limitation.
 
 Create or reuse a standalone backlog item using the ordinary add-item rules. Record the source review path, criterion ID, technical `validation_status`, decisive failure or blocker evidence, accepted limitation, deferral reason, and observable completion criteria. Do not remove or rewrite the criterion in the goal-validation block, change `validation_status`, or imply that acceptance made it pass. The validation artifact remains the durable evidence of the result; the backlog item records only the future remediation. If any prerequisite is missing or ambiguous, leave the validation artifact unchanged and ask for the missing decision.
@@ -129,10 +130,10 @@ If no exact item matches, say so and list the available slugs. Do not guess the 
 
 ## Close or drop an item
 
-Delete an item only when the user explicitly requests one of these outcomes:
+Delete an item only when the responsible party explicitly requests one of these outcomes:
 
 - **completed:** verify the recorded `Done when` criteria against the repository where possible, then delete the file;
-- **dropped:** delete it because the user has decided not to keep the task.
+- **dropped:** delete it because the responsible party has decided not to keep the task.
 
 If completion cannot be verified, report what is missing and leave the file intact. Deleting the backlog file does not authorize a commit or push.
 

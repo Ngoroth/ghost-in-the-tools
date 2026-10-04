@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository read access, permission to run safe project checks, and permission to update only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.1.2"
+  version: "2.0.0"
 ---
 
 # Goal Validation
@@ -16,7 +16,8 @@ Independently demonstrate whether the current implementation achieves the plan's
 
 - Prefer a fresh session that did not implement the change. Regardless of session history, verify evidence directly instead of trusting summaries.
 - Validate the repository state that exists when invoked. Do not track or compare states between workflow stages; orchestration is external.
-- Treat source, tests, configuration, the plan, and review findings as read-only. Write only validation state, `acceptance_status`, and, when explicitly supplied, the human-acceptance decision in the selected `docs/reviews/*.md` artifact.
+- Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer acceptance authority; report missing responsibility or decisions and reuse applicable decisions already supplied.
+- Treat source, tests, configuration, the plan, and review findings as read-only. Write only validation state, `acceptance_status`, and, when explicitly supplied, the acceptance decision in the selected `docs/reviews/*.md` artifact.
 - Safe tests, builds, linters, local execution, and read-only diagnostics are allowed. Do not deploy, mutate external systems, use credentials, or perform destructive checks without explicit authorization.
 - Do not edit implementation files, apply fixes, stage, commit, push, post comments, merge, create backlog items, or start another workflow stage.
 - Replace any secret or credential value in validation evidence with `[REDACTED]`.
@@ -104,7 +105,7 @@ validation_status: passed | failed | blocked
 acceptance_status: not_recorded | accepted | accepted_with_limitations | rejected
 ```
 
-`validation_status` is the evidence-based technical verdict. `acceptance_status` records the user's explicit decision applicable to the current result; use `not_recorded` when none applies. Preserve the human-acceptance record. On later validation runs, retain `accepted`/`accepted_with_limitations` only if all current `FAIL`/`BLOCKED` results are covered by that decision. New or worsened failures or blockers require a new decision: set `acceptance_status` to `not_recorded` and explain what changed. Preserve `rejected` until the user changes it. For legacy artifacts, apply the same rules to the explicit decision in `## Human acceptance`; otherwise use `not_recorded`.
+`validation_status` is the evidence-based technical verdict. `acceptance_status` records the responsible party's explicit decision applicable to the current result; record the decision maker, its source, and the accepted scope, and use `not_recorded` when no applicable decision has been supplied. Preserve the acceptance record. On later validation runs, retain `accepted`/`accepted_with_limitations` only if all current `FAIL`/`BLOCKED` results are covered by that decision. New or worsened failures or blockers require a new decision: set `acceptance_status` to `not_recorded` and explain what changed. Preserve `rejected` until the responsible party changes it. For legacy artifacts, apply the same rules to an explicit decision in the existing acceptance record; otherwise use `not_recorded`.
 
 Append one validation block at the end of the file. On a later run, replace the existing block between the markers instead of accumulating attempt history:
 
@@ -130,22 +131,22 @@ Append one validation block at the end of the file. On a later run, replace the 
 <!-- GOAL-VALIDATION:END -->
 ```
 
-Include every criterion exactly once. Keep evidence concise but sufficient to reproduce or inspect. Describe each shared missing prerequisite once with the affected criterion IDs; criterion counts are coverage counts, not independent defect counts. Preserve all review findings, unrelated frontmatter, and any human-acceptance record outside the validation markers.
+Include every criterion exactly once. Keep evidence concise but sufficient to reproduce or inspect. Describe each shared missing prerequisite once with the affected criterion IDs; criterion counts are coverage counts, not independent defect counts. Preserve all review findings, unrelated frontmatter, and any acceptance record outside the validation markers.
 
-## Human acceptance is separate
+## Acceptance is separate
 
-A user may accept or reject a prototype or iteration independently of the technical verdict. This decision is not evidence that checks passed: do not convert `BLOCKED` or `FAIL` to `PASS` or weaken the original criteria merely because the user accepts the iteration. Use specific user-reported observations only for claims they actually establish, clearly attributing the evidence.
+The responsible party may accept or reject a prototype or iteration independently of the technical verdict. This decision is not evidence that checks passed: do not convert `BLOCKED` or `FAIL` to `PASS` or weaken the original criteria merely because the iteration is accepted. Use supplied observations only for claims they actually establish, clearly attributing their source.
 
-When the user explicitly supplies an acceptance decision, update `acceptance_status` and append or update a short `## Human acceptance` section outside the validation markers in the same review artifact:
+When the responsible party explicitly supplies an acceptance decision, update `acceptance_status` and append or update a short `## Acceptance` section outside the validation markers in the same review artifact:
 
-- `accepted` — the user accepts an iteration whose validation passed and states no additional limitation;
-- `accepted_with_limitations` — the user accepts closure while validation is failed or blocked, or while explicitly acknowledging a waived or deferred limitation;
-- `rejected` — the user does not accept the iteration;
+- `accepted` — the responsible party accepts an iteration whose validation passed and states no additional limitation;
+- `accepted_with_limitations` — the responsible party accepts closure while validation is failed or blocked, or while explicitly acknowledging a waived or deferred limitation;
+- `rejected` — the responsible party does not accept the iteration;
 - `not_recorded` — no explicit decision applies to the current result.
 
-Record the decision and accepted scope, any explicitly accepted failed or blocked criteria, unexecuted checks, and deferred concerns. Do not infer waivers or acceptance from a vague positive comment. Preserve this record on later validation runs. Recording a decision does not authorize cleanup, implementation, commit, or publication.
+Record the decision maker, decision source, and accepted scope, any explicitly accepted failed or blocked criteria, unexecuted checks, and deferred concerns. Do not infer waivers or acceptance from a vague positive comment. Preserve this record on later validation runs. Recording a decision does not authorize cleanup, implementation, commit, or publication.
 
-If the user asks to "make it pass" because they accept a known failure or missing check, preserve the evidence-based `validation_status`, record the appropriate acceptance status, and explain both results together. An `accepted` or `accepted_with_limitations` decision means the iteration may proceed to wrap-up; it does not mean validation passed.
+If the responsible party asks to "make it pass" because they accept a known failure or missing check, preserve the evidence-based `validation_status`, record the appropriate acceptance status, and explain both results together. An `accepted` or `accepted_with_limitations` decision means the iteration may proceed to wrap-up; it does not mean validation passed.
 
 ## Report and stop
 
@@ -159,6 +160,6 @@ Report:
 - commands actually run and their outcomes;
 - remaining manual or external actions.
 
-A validation failure is an acceptance result, not a code-review finding. Do not assign severity, create `CR-NNN`, edit the implementation, decide whether another review is needed, or launch fixes automatically. The user manages the next workflow step.
+A validation failure is an acceptance result, not a code-review finding. Do not assign severity, create `CR-NNN`, edit the implementation, decide whether another review is needed, or launch fixes automatically. The responsible party determines the next workflow step.
 
-Stop after recording and reporting the result. Making the human acceptance decision, commit, publication, backlog transfer, retrospective, and cleanup are outside this skill; only recording an explicitly supplied decision is allowed as described above.
+Stop after recording and reporting the result. Making acceptance decisions, commit, publication, backlog transfer, retrospective, and cleanup are outside this skill; only recording an explicitly supplied decision is allowed as described above.

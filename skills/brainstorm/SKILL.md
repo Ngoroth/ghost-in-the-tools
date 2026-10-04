@@ -5,7 +5,7 @@ license: MIT
 compatibility: "OpenAI Codex; requires repository file access and preferably git."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "1.1.4"
+  version: "2.0.0"
 ---
 
 # Brainstorm
@@ -15,12 +15,13 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 ## Rules
 
 - Treat the repository as read-only until the final brainstorm record is written.
+- Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer that authority; report missing responsibility or decisions and reuse applicable decisions already supplied.
 - Use plain language in the user dialogue. Explain proposals through what the user will do, what result they will get, and the consequences of each choice. Use technical terms only when needed to make a decision, and briefly explain them. Make questions answerable without knowing the project's internal architecture.
 - Ask at most one question per message, only when its answer can materially change the design. Prefer 2-4 choices when useful and put the recommendation first.
-- Reuse information already provided; do not ask the user to repeat it.
-- Distinguish repository facts, agent recommendations, and user decisions.
+- Reuse information and decisions already provided; do not ask for the same information or approval again unless new evidence changes it.
+- Distinguish repository facts, agent recommendations, and decisions from the responsible party.
 - Keep scope minimal and apply YAGNI.
-- Do not modify code, tests, configuration, or plans. Do not commit, push, or implement unless separately requested after saving the brainstorm.
+- Do not modify code, tests, configuration, or plans. Do not commit, push, or implement under this skill; subsequent work requires applicable authorization from the responsible party.
 
 ## Workflow
 
@@ -34,7 +35,7 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 
 - Ask only questions whose answers can materially change the design.
 - Focus on scope, users, integration points, compatibility, failure behavior, and verification.
-- Establish the intended quality level when it affects the design: technical prototype, personal-use tool, or release-ready product. For UI work, agree on interface language, the main user flow, and a lightweight sketch or reference when needed. For quality-sensitive output, agree on representative examples and an acceptable outcome. Do not invent user approval or require irrelevant design documents.
+- Establish the intended quality level when it affects the design: technical prototype, personal-use tool, or release-ready product. For UI work, agree on interface language, the main user flow, and a lightweight sketch or reference when needed. For quality-sensitive output, agree on representative examples and an acceptable outcome. Do not invent approval or require irrelevant design documents.
 - Challenge assumptions politely.
 - Resolve high-impact ambiguity before proposing a design. Record intentionally deferred details as open questions.
 
@@ -43,19 +44,19 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 1. Present 2-3 genuinely different approaches when alternatives exist.
 2. Lead with the recommended approach and explain why it best fits the constraints.
 3. Summarize the meaningful benefits, costs, and risks of each option. When costs affect the choice, describe the scope of changes, dependencies, resource needs, recurring operations, and maintenance burden. Distinguish one-time preparation from work repeated on each use, and identify what can be reused. Do not estimate implementation or execution time. State the basis and uncertainty of any quantitative resource or monetary estimate; do not invent precision or run expensive experiments solely to produce an estimate.
-4. Let the user select, combine, or reject them. Never treat a recommendation as an approved decision.
+4. Obtain the approach decision from the responsible party, who may select, combine, or reject the options. Use an already supplied decision when applicable. Never treat a recommendation as an approved decision.
 
 ### 4. Validate the design
 
 Present one short, coherent section at a time and confirm it before continuing. Cover only relevant areas, such as components, flows, contracts, persistence, failures, security, observability, testing, and rollout.
 
-Each section should explain a coherent design decision and its practical consequences. State exactly what the user is being asked to confirm. Do not split a connected decision into trivial confirmations or ask again about an already approved decision unless new evidence changes it.
+Each section should explain a coherent design decision and its practical consequences. State exactly what the responsible party is being asked to confirm. Do not split a connected decision into trivial confirmations or ask again about an already approved decision unless new evidence changes it.
 
-Track approved decisions, rejected alternatives and reasons, risks, and open questions. Backtrack when the user corrects an assumption.
+Track approved decisions, rejected alternatives and reasons, risks, and open questions. Backtrack when an authorized correction changes an assumption.
 
 ### 5. Save the result
 
-The brainstorm is complete only when the user explicitly approves the overall design or asks to finish or save it. Save before offering a next action.
+The brainstorm is complete only when the responsible party explicitly approves the overall design or authorizes finalizing the record. Save before offering a next action.
 
 1. Create `docs/brainstorm/` under the repository root.
 2. Write exactly one file for the session:
