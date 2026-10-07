@@ -4,7 +4,7 @@ description: "Use to explain, select, or sequence the Ghost in the Tools skills,
 license: MIT
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.0"
+  version: "2.0.2"
 ---
 
 # Workflow Guide
@@ -41,6 +41,7 @@ Decision authority does not replace technical evidence, reviewer independence, o
 | Capture, list, inspect, or close deferred work | [backlog](../backlog/SKILL.md) | Requested operation and task or accepted finding → standalone items in `docs/backlog/`. Listing and inspection do not authorize implementation. |
 | Close an iteration and preserve its evidence | [wrap-up](../wrap-up/SKILL.md) | Selected plan, review/validation evidence, and supplied acceptance decision → closing section, agreed follow-ups, and archival when closure conditions hold. |
 | Explain the current session's result | [session-work-summary](../session-work-summary/SKILL.md) | Available conversation and tool evidence → concise chat summary, without new checks or file changes. |
+| Retrospect on selected work and discuss skill improvements | [skill-improvement](../skill-improvement/SKILL.md) | Explicit repository and plan(s) or time window plus available evidence → one proposed change at a time; no automatic application. |
 
 Implementation and fixes have no dedicated skill in this set. They are ordinary development work under the user's request and the approved plan; neither a reviewer nor this guide takes ownership of them implicitly.
 
@@ -61,6 +62,7 @@ Enter where the request and existing evidence place the task. A settled design n
 - **Review and fixes:** `needs-revision` routes to the plan author; `needs-fixes` routes to the implementer. They may mark findings `addressed`; only the independent reviewer can mark them `resolved`. Both `open` and `addressed` findings remain unresolved. Continue the same artifacts, finding IDs, and bounded review rounds. `MINOR` findings do not require another round. At `needs-decision`, surface the exact unresolved choice to the responsible party; do not reset counters or create a new artifact to bypass the limit.
 - **Code review to validation:** require `approved` or `approved-with-notes` and no unresolved `CRITICAL` or `MAJOR` findings. Missing external evidence alone is incomplete verification, not an implementation defect; validation determines its effect on acceptance criteria.
 - **Validation to acceptance:** `PASS`, `FAIL`, and `BLOCKED` describe evidence for each criterion. The aggregate technical status (`passed`, `failed`, or `blocked`) is separate from `acceptance_status` (`not_recorded`, `accepted`, `accepted_with_limitations`, or `rejected`). Acceptance cannot turn an unexecuted or failing check into a pass. New or worsened limitations require a decision covering them. Report failures or missing evidence so the responsible party can decide the next step; validation does not launch fixes.
+- **Validation remediation:** The validator derives and reports the result from evidence, then stops; the responsible party authorizes the next action within the existing mandate. If only execution proof is missing and the reviewed scope is unchanged, obtain the missing proof and return to goal-validation without a new code review. Changes to implementation, tests, or a required validation procedure need independent convergence review before goal-validation. Continue the same artifacts and finding IDs and bounded counters; never reset them.
 - **Acceptance to closure:** use wrap-up's closure rules and reread the authoritative artifacts before writing. Rejection prevents archival; failed or blocked criteria require explicit acceptance covering every current limitation. Invoking wrap-up is not itself acceptance. Keep review and validation evidence when archiving the plan.
 
 Publication is outside this sequence: none of these skills automatically stages, commits, pushes, merges, deploys, or publishes.
@@ -68,6 +70,7 @@ Publication is outside this sequence: none of these skills automatically stages,
 ## Independent sessions and shared artifacts
 
 Plan review requires a session that did not author or substantively revise the plan. Code review requires a fresh session that did not implement the change. Goal validation prefers a fresh session, but its essential requirement is direct verification of evidence. Changing the role label in the authoring session does not establish review independence.
+- Progress checkboxes are owned by the plan implementer, not the plan author or director, and are marked from completion evidence. Mark independent review, validation, or acceptance complete only from the corresponding report or explicit decision. Checkbox updates do not authorize technical verdicts, finding resolution, or acceptance decisions.
 
 Session creation, scheduling, messages, and transport belong to the surrounding environment. When preparing work for another session, provide only the relevant context:
 
@@ -76,7 +79,7 @@ Session creation, scheduling, messages, and transport belong to the surrounding 
 - goal, settled constraints, applicable decisions or authorization, and the responsible party for any pending decision;
 - for code review, the known base ref or starting SHA and scope boundaries;
 - current revision, review round, unresolved finding IDs, and exact missing prerequisites when applicable;
-- permitted writes and expected result or stopping condition, as defined by the selected skill.
+- permitted writes; required evidence, report, and stopping condition. Do not prescribe a technical verdict or finding resolution in the handoff.
 
 The receiving session reads the actual artifacts and verifies claims; a handoff summary is not replacement evidence. A replacement reviewer continues the existing lifecycle. Avoid concurrent edits to the same plan or review artifact: finish the current writer's work before a dependent stage consumes it. Available session statuses may signal a conflict, but do not substitute for repository evidence or user decisions. No additional coordinator log or state format is required.
 

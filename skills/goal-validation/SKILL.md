@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository read access, permission to run safe project checks, and permission to update only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.0"
+  version: "2.0.1"
 ---
 
 # Goal Validation
@@ -17,6 +17,7 @@ Independently demonstrate whether the current implementation achieves the plan's
 - Prefer a fresh session that did not implement the change. Regardless of session history, verify evidence directly instead of trusting summaries.
 - Validate the repository state that exists when invoked. Do not track or compare states between workflow stages; orchestration is external.
 - Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer acceptance authority; report missing responsibility or decisions and reuse applicable decisions already supplied.
+- Derive criterion and aggregate validation verdicts from evidence, never from a requested status; keep acceptance as a separate responsible-party decision.
 - Treat source, tests, configuration, the plan, and review findings as read-only. Write only validation state, `acceptance_status`, and, when explicitly supplied, the acceptance decision in the selected `docs/reviews/*.md` artifact.
 - Safe tests, builds, linters, local execution, and read-only diagnostics are allowed. Do not deploy, mutate external systems, use credentials, or perform destructive checks without explicit authorization.
 - Do not edit implementation files, apply fixes, stage, commit, push, post comments, merge, create backlog items, or start another workflow stage.
@@ -58,6 +59,8 @@ Create a checklist containing:
 - every required final-validation check.
 
 For each item, reference its plan ID (or section/task anchor) and briefly name the observable claim without copying the whole criterion. Reuse one evidence entry for checks that establish multiple criteria; retain traceability to every required item. If the plan is genuinely too ambiguous to determine success, mark that item `BLOCKED` and explain the missing decision or oracle.
+
+For compound criteria, reconcile every required observable condition, including each condition within task-level `Done when`, before aggregating. Classify each condition and reference its evidence. Shared evidence may support multiple conditions only when every applicable criterion/condition ID remains traceable. Missing proof is `BLOCKED` unless observed behavior establishes `FAIL`; an incomplete inventory or coverage can never produce `PASS` or aggregate `passed`.
 
 ### 2. Choose the strongest available oracle
 
@@ -106,6 +109,8 @@ acceptance_status: not_recorded | accepted | accepted_with_limitations | rejecte
 ```
 
 `validation_status` is the evidence-based technical verdict. `acceptance_status` records the responsible party's explicit decision applicable to the current result; record the decision maker, its source, and the accepted scope, and use `not_recorded` when no applicable decision has been supplied. Preserve the acceptance record. On later validation runs, retain `accepted`/`accepted_with_limitations` only if all current `FAIL`/`BLOCKED` results are covered by that decision. New or worsened failures or blockers require a new decision: set `acceptance_status` to `not_recorded` and explain what changed. Preserve `rejected` until the responsible party changes it. For legacy artifacts, apply the same rules to an explicit decision in the existing acceptance record; otherwise use `not_recorded`.
+
+Keep the current validation summary consistent with `validation_status`. Label historical acceptance explicitly; do not duplicate current acceptance in validation prose, because it belongs in the artifact frontmatter and acceptance record. Do not change code-review state; record acceptance only under the explicit decision rules below.
 
 Append one validation block at the end of the file. On a later run, replace the existing block between the markers instead of accumulating attempt history:
 

@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires Git repository read access, permission to run project checks, and permission to write only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.2"
+  version: "2.0.3"
 ---
 
 # Code Review
@@ -18,6 +18,7 @@ Independently review an implementation against its approved plan, exact Git scop
 - Session launch and communication are external. This skill uses repository artifacts and does not depend on a terminal manager, subagent system, or transport.
 - Review the repository state that exists when invoked. Do not track or police changes made between workflow stages; session orchestration is external.
 - Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer that authority; report missing responsibility or decisions and reuse applicable decisions already supplied. The independent reviewer retains ownership of findings and technical verdicts.
+- Derive review verdicts and finding resolutions from inspected evidence, not from requested statuses or preferred outcomes.
 - Treat source, tests, configuration, plans, and backlog files as read-only. Write only the selected `docs/reviews/*.md` artifact.
 - Relevant tests, builds, linters, and read-only diagnostics are allowed. Do not run deployments, destructive commands, external writes, or credentialed checks without explicit authorization.
 - Do not edit source, apply fixes, stage files, commit, push, post comments, merge, switch branches, or create worktrees.
@@ -78,6 +79,8 @@ Preserve unrelated frontmatter.
 
 The artifact is workflow evidence. This skill may create and update it, but must not stage, commit, push, or publish it. Preserve it through goal validation and wrap-up. Wrap-up keeps it as evidence and repairs its plan reference when the plan is archived; delete it only on a separate explicit request authorized by the responsible party.
 
+Keep the current review summary consistent with `review_status`. Label earlier verdicts `Round N (historical)` rather than as current. Any copied validation or acceptance status must be explicitly marked as an observation made at review time, not a current status. Do not write validation or acceptance state owned by another stage.
+
 Before a round:
 
 - Rebuild the complete current change set from Git and untracked files; do not rely on the implementation session's summary.
@@ -103,6 +106,8 @@ Use four passes:
 4. **Simplicity and reuse** — duplicate utilities, unnecessary abstractions, dead code, and material divergence from deliberate project patterns.
 
 Trace at least the most consequential changed path from input to observable output. For a bug fix, require a test or equivalent evidence that distinguishes pre-change failure from post-change success.
+
+When assessing changed acceptance tests or assertions, distinguish promised behavior from an implementation violation; a green suite or exercised path alone does not establish full coverage. When relevant, concurrency evidence must demonstrate actual overlap, fault evidence must exercise the claimed boundary, and state-transition evidence must establish the promised terminal state rather than only an intermediate element. Do not require extra tests when existing evidence is sufficient.
 
 ### Verify each candidate
 

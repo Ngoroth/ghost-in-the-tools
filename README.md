@@ -33,6 +33,7 @@ Implementation intentionally has no dedicated skill. The user's chosen process a
 - **`backlog`** — stores deferred work as standalone files under `docs/backlog/` and safely transfers accepted non-blocking findings.
 - **`wrap-up`** — records the outcome, accepted limits, follow-ups, and lessons, then archives a genuinely closed plan.
 - **`session-work-summary`** — briefly explains what changed in the current coding session, how it was done, and what was actually checked.
+- **`skill-improvement`** — optionally reviews selected work against the skill contract and discusses evidence-supported skill changes one at a time; discussion does not authorize application.
 
 ## Install for Codex
 
@@ -64,6 +65,7 @@ To make the skills repository-specific instead, copy the folders into `<reposito
 - Reaching the review limit prevents another round even when no blocking findings remain. Continuing requires an explicit decision from the responsible party and an updated `max_review_rounds`; `review_round` is not reset.
 - Goal validation starts only after code review is `approved` or `approved-with-notes`, with no unresolved blocking findings (`open` or `addressed`).
 - Code approval and external acceptance are separate.
+- Progress checkboxes belong to the plan implementer and reflect completion evidence. Independent review, validation, and acceptance are complete only when their respective report or explicit decision says so; checking a box does not authorize a technical verdict, finding resolution, or acceptance.
 - Missing external evidence is `BLOCKED`, not an invented implementation defect.
 - Acceptance never silently converts `FAIL` or `BLOCKED` into `PASS`.
 - Validation records technical status and explicit acceptance as separate states, including the decision maker, source, and scope. New or worsened failures or blockers require renewed acceptance; rejection always prevents closure.

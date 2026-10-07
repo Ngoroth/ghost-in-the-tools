@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Codex; requires repository file access and the backlog skill."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.0"
+  version: "2.0.1"
 ---
 
 # Wrap up
@@ -23,6 +23,7 @@ Required decisions belong to the responsible party identified by the user's chos
    - **Acceptance and limits:** the actual decision from the responsible party, or “not supplied”; remaining checks and accepted limitations.
    - **Follow-ups:** backlog paths and any useful unapproved suggestion.
    - **Lessons:** up to three concrete observations → what to do differently next time. Omit empty or generic lessons; do not edit shared instructions or skills.
+   - Report every still-unchecked required task with its completion evidence. If required work is unfinished, report the responsible party's explicit accepted unfinished scope or the blocker. Do not tick tasks during wrap-up; an archived location alone does not prove completion.
    Preserve original requirements, checkboxes, review findings, revisions, and verdicts except for the backlog skill's authorized handoff. This closing section is not a plan redesign.
 4. **Archive only a closed iteration.** Never archive when `acceptance_status` is `rejected` or the supplied acceptance decision rejects closure. Otherwise move the plan to `docs/plans/completed/<same-filename>` only when existing evidence establishes completion with no unresolved required work, or explicit acceptance by the responsible party covers every current failed or blocked criterion and its limitation. An invocation alone is not acceptance. Never change the technical `validation_status` to justify closure. Otherwise keep the plan where it is and report what prevents closure. Never overwrite a conflicting destination. Repair affected document links, including relative links inside the moved plan and its review's plan reference; do not rewrite code or configuration. Keep the review artifact as evidence; delete it only on a separate explicit request authorized by the responsible party.
 5. **Verify and stop.** Check the resulting files and links. A repeated invocation updates the same closing section and reuses existing backlog items; an already archived plan stays put. If any required write or verification fails, preserve the source and report partial progress, not successful closure. Report the plan's final path, technical validation status, acceptance status, backlog paths, and a short outcome.
