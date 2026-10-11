@@ -3,8 +3,8 @@ name: workflow-guide
 description: "Use to explain, select, or sequence the Ghost in the Tools skills, resume their workflow from existing artifacts, or prepare context for the next session."
 license: MIT
 metadata:
-  author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.2"
+  author: "Daniil(Ngoroth)"
+  version: "2.0.3"
 ---
 
 # Workflow Guide
@@ -59,6 +59,26 @@ Enter where the request and existing evidence place the task. A settled design n
 
 - **Design to plan:** material decisions must be settled before planning writes a plan. Return connected design questions to brainstorm; do not hide them in implementation tasks.
 - **Plan to implementation:** plan review must approve the current revision (`approved` or `approved-with-notes`, with `reviewed_revision` equal to `plan_revision`). Technical approval and implementation authorization from the responsible party are separate; authorization may already have been supplied for this scope. A substantive revision invalidates the previous review approval under the planning rules.
+- **Contradictions discovered during implementation:** when new evidence
+  materially contradicts the approved plan, pause the affected work rather
+  than silently changing the approach. Report:
+  - **Discovery:** what differs from the approved plan.
+  - **Evidence:** the concrete repository reference, observed behavior,
+    command result, or external contract that establishes the difference.
+  - **Impact:** which tasks, dependencies, compatibility guarantees, or
+    acceptance criteria are affected, and what can no longer proceed as written.
+  - **Recommendation:** the smallest proposed revision and any required
+    decision or missing evidence.
+  This report does not authorize a different implementation. A substantive
+  plan revision invalidates the previous review approval. Before implementing
+  the revised work, require independent plan review to approve the current
+  revision (`approved` or `approved-with-notes`, with `reviewed_revision`
+  equal to `plan_revision`) and applicable implementation authorization
+  from the responsible party.
+  Reuse prior authorization only where it still covers the revised work;
+  obtain a new decision for changes outside its scope. Do not escalate
+  implementation details that remain consistent with the approved scope,
+  approach, and acceptance criteria.
 - **Review and fixes:** `needs-revision` routes to the plan author; `needs-fixes` routes to the implementer. They may mark findings `addressed`; only the independent reviewer can mark them `resolved`. Both `open` and `addressed` findings remain unresolved. Continue the same artifacts, finding IDs, and bounded review rounds. `MINOR` findings do not require another round. At `needs-decision`, surface the exact unresolved choice to the responsible party; do not reset counters or create a new artifact to bypass the limit.
 - **Code review to validation:** require `approved` or `approved-with-notes` and no unresolved `CRITICAL` or `MAJOR` findings. Missing external evidence alone is incomplete verification, not an implementation defect; validation determines its effect on acceptance criteria.
 - **Validation to acceptance:** `PASS`, `FAIL`, and `BLOCKED` describe evidence for each criterion. The aggregate technical status (`passed`, `failed`, or `blocked`) is separate from `acceptance_status` (`not_recorded`, `accepted`, `accepted_with_limitations`, or `rejected`). Acceptance cannot turn an unexecuted or failing check into a pass. New or worsened limitations require a decision covering them. Report failures or missing evidence so the responsible party can decide the next step; validation does not launch fixes.

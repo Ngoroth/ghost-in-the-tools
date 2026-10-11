@@ -5,7 +5,7 @@ license: MIT
 compatibility: "OpenAI Codex; requires repository file access and preferably git."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.0"
+  version: "2.0.1"
 ---
 
 # Planning
@@ -38,6 +38,27 @@ Create a concrete implementation plan grounded in the current repository. Planni
 ### 2. Pass the decision-readiness gate
 
 Ask one question at a time when required. Prefer 2-4 concrete choices and put the recommendation first.
+
+When explaining an unresolved issue that affects planning, distinguish:
+
+- **Ambiguity:** multiple plausible interpretations would change the plan.
+- **Contradiction:** relevant requirements, repository behavior, tests, or documentation conflict.
+- **Blocker:** a required decision, artifact, dependency, access, or feasibility evidence is missing, preventing a safely executable plan.
+- **Risk:** planning can proceed, but an identified failure possibility needs mitigation or validation.
+- **Assumption:** a stated, non-material default that does not require a responsible-party decision.
+
+For each material issue, briefly state the evidence or missing information,
+its consequence, whether it blocks planning, and the recommended resolution
+or mitigation. A contradiction is not automatically a blocker.
+
+Resolve material ambiguities and contradictions before writing. Record
+non-blocking assumptions under `Context and constraints`, and residual risks
+with their selected mitigations under `Risks and mitigations`. Do not label
+a material unresolved decision as an assumption or risk to bypass the
+decision-readiness gate.
+
+Use these distinctions only when useful; no mandatory table, separate issue
+register, or empty “no blockers” section is required.
 
 Clarify only material gaps such as:
 

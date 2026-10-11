@@ -5,7 +5,7 @@ license: MIT
 compatibility: "OpenAI Codex; requires repository file access and preferably git."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.0"
+  version: "2.0.1"
 ---
 
 # Brainstorm
@@ -38,6 +38,23 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 - Establish the intended quality level when it affects the design: technical prototype, personal-use tool, or release-ready product. For UI work, agree on interface language, the main user flow, and a lightweight sketch or reference when needed. For quality-sensitive output, agree on representative examples and an acceptable outcome. Do not invent approval or require irrelevant design documents.
 - Challenge assumptions politely.
 - Resolve high-impact ambiguity before proposing a design. Record intentionally deferred details as open questions.
+
+When an unresolved issue affects the design or the next action, distinguish:
+
+- **Ambiguity:** multiple plausible interpretations would lead to different designs.
+- **Contradiction:** relevant requirements, repository behavior, tests, or documentation conflict.
+- **Blocker:** a required decision, artifact, dependency, access, or feasibility evidence is missing, so the affected work cannot safely proceed.
+- **Risk:** work can proceed, but an identified failure possibility needs mitigation or validation.
+- **Assumption:** a stated, non-material default that does not require a responsible-party decision.
+
+For each material issue, briefly state the evidence or missing information,
+its consequence, whether it blocks the next action, and the recommended
+resolution or mitigation. A contradiction is not automatically a blocker;
+explain whether it prevents a safe decision.
+
+Do not label a material unresolved decision as an assumption to bypass
+approval. Use these distinctions only when useful; no mandatory table,
+separate issue register, or empty “no blockers” section is required.
 
 ### 3. Explore approaches
 
