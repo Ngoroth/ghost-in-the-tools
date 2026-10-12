@@ -2,10 +2,10 @@
 name: planning
 description: "Use when writing a repo implementation plan; saves it."
 license: MIT
-compatibility: "OpenAI Codex; requires repository file access and preferably git."
+compatibility: "Agent Skills-compatible coding agents; requires repository access and native subagent delegation permitted for the selected scope."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.1"
+  version: "2.2.0"
 ---
 
 # Planning
@@ -31,9 +31,44 @@ Create a concrete implementation plan grounded in the current repository. Planni
 ### 1. Understand the work
 
 1. Find the repository root, preferably with `git rev-parse --show-toplevel`. If it cannot be identified, ask for its path.
-2. Read applicable instructions and relevant context: `AGENTS.md`, `CLAUDE.md` when present, README/docs, related brainstorm records, nearby code and tests, build configuration, and useful recent commits.
-3. Inspect enough context to identify real file paths, existing patterns, dependencies, and verification commands. Do not invent them.
+2. Read applicable instructions (`AGENTS.md`, `CLAUDE.md` when present),
+   related brainstorm records, and enough repository overview to identify
+   the areas relevant to the settled scope.
+3. Complete the delegated research gate below before clarifying plan decisions
+   or writing implementation tasks.
 4. Briefly summarize the goal, scope, acceptance criteria, constraints, and any decisions that still prevent planning.
+
+#### Delegated research gate
+
+- Use the harness's actual subagent-spawning tool. Prefer a read-only
+  codebase exploration agent when available; a role description or research
+  performed by the main agent does not count as delegation.
+- Give each researcher one bounded question, relevant repository areas,
+  and the settled scope and decisions. Run independent investigations
+  concurrently when supported. Do not require a fixed agent count,
+  assign whole-repository surveys, or delegate plan authorship.
+- Require concise findings with inspected paths and symbols, existing
+  patterns, affected contracts, dependencies, tests, build configuration,
+  verification commands and useful history, and material unknowns.
+  Distinguish inspected facts from inference. Researchers must not edit files,
+  run builds or tests, install dependencies, or mutate external state.
+  Return findings in the session without creating repository research artifacts.
+- Wait for the required investigations to complete, inspect their findings,
+  and verify decisive source references yourself. Reconcile conflicting
+  findings. Identify which subagent investigated each area when summarizing
+  the research. Do not invent paths or commands.
+- Perform fresh delegated research for each new planning invocation.
+  Prior research summaries may guide the investigation, but do not satisfy
+  this invocation's research gate.
+  Within the same ongoing invocation, do not repeat completed investigations
+  after every clarification. Investigate additional areas only when new
+  decisions, scope changes, repository changes, or conflicting evidence
+  make them relevant.
+- If delegation is unavailable, fails, or is prohibited by higher-priority
+  policy for this scope, report the exact limitation and stop before decision
+  clarification or plan writing. Do not silently substitute solo research,
+  claim unperformed delegation, or manufacture additional tasks to make
+  delegation permissible.
 
 ### 2. Pass the decision-readiness gate
 
@@ -110,6 +145,29 @@ Each task should be one small, reviewable logical unit. Order tasks by dependenc
 Tasks may describe already-decided runtime behavior such as error handling, retries, or a fixed fallback. They must not branch into competing implementation paths or ask the implementer to select one. If feasibility of the chosen approach is not established and failure would require a different plan, stop and resolve that feasibility before writing this implementation plan.
 
 For every code-changing task, include tests or explain why no automated test applies. Keep manual or external actions separate from repository implementation tasks.
+
+Use Testing Trophy as the default testing strategy, not a test-count quota.
+Prioritize integration coverage for changed component interactions, using
+real implementations across the boundary under test. Test doubles may
+isolate dependencies outside that boundary; assertions must establish
+observable outcomes and relevant failure behavior, not merely mocked calls.
+Retain focused unit tests for isolated logic and boundary cases.
+
+For interface or visual-output changes, require inspection of the actual
+rendered result in representative affected states. Add or update automated
+checks for concrete layout and interaction risks, such as clipping, overlap,
+scroll reachability, usable action targets, and content accessibility.
+Choose image comparisons when appearance itself is the relevant regression
+risk; do not require screenshot infrastructure for every interface change.
+
+Use the narrowest test boundary that proves the required behavior.
+Do not require full-system or resource-heavy checks for changes outside
+their boundaries. Platform-dependent claims require evidence on the relevant
+platform; simulated layout alone does not prove system-window behavior.
+
+Reuse sufficient existing test coverage. Specify the expected outcome,
+test or inspection method, representative states, and prerequisites in
+the plan. Missing required evidence remains a blocker, not a silent waiver.
 
 Task-level `Done when` describes completion of that implementation unit and its repository-local verification. Put required device checks, external-system checks, and explicitly required human judgments in a separate part of `Final validation`, with their prerequisite and evidence needed; do not repeat the same external blocker inside every task. These checks remain required for overall acceptance unless the responsible party explicitly decides otherwise.
 

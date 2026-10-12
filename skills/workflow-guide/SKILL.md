@@ -4,12 +4,18 @@ description: "Use to explain, select, or sequence the Ghost in the Tools skills,
 license: MIT
 metadata:
   author: "Daniil(Ngoroth)"
-  version: "2.0.3"
+  version: "2.0.4"
 ---
 
 # Workflow Guide
 
 Guide use of the Ghost in the Tools skill set. Identify the appropriate skill, its inputs, the evidence needed to proceed, and where its responsibility ends. This guide depends only on the companion skills and their repository artifacts; it requires no particular agent, session manager, orchestration framework, or communication tool.
+
+Brainstorm and planning require the environment to provide permitted native
+read-only subagent research. This guide does not launch that research;
+the invoked skill owns its research gate. Each new invocation requires fresh
+research; continuing the same invocation requires additional investigation
+only when relevant decisions, scope, repository state, or evidence change.
 
 ## Use the guide
 

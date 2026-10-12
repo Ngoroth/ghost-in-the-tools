@@ -4,6 +4,13 @@ A small, repository-native skill set for responsibility-driven, AI-assisted soft
 
 The workflow keeps decisions and evidence in ordinary Markdown files inside the project repository. It does not require a specific terminal, session manager, orchestration framework, or automatic Git workflow.
 
+Brainstorm and planning require fresh native read-only subagent research
+for each new invocation before design or plan decisions. They remain
+independent of a particular harness, but cannot proceed past that research
+gate when delegation is unavailable, fails, or is prohibited for the selected
+scope. Continuing the same invocation does not repeat completed research
+unless relevant decisions, scope, repository state, or evidence change.
+
 ## Workflow
 
 ```text

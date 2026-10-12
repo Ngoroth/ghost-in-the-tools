@@ -2,10 +2,10 @@
 name: brainstorm
 description: "Use when brainstorming a repo change; guides and records."
 license: MIT
-compatibility: "OpenAI Codex; requires repository file access and preferably git."
+compatibility: "Agent Skills-compatible coding agents; requires repository access and native subagent delegation permitted for the selected scope."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.1"
+  version: "2.1.0"
 ---
 
 # Brainstorm
@@ -28,8 +28,43 @@ Turn a rough idea into a repository-grounded design through a concise, collabora
 ### 1. Understand
 
 1. Find the repository root, preferably with `git rev-parse --show-toplevel`. If no repository can be identified, ask for its path.
-2. Read applicable instructions and relevant context: `AGENTS.md`, `CLAUDE.md` when present, README/docs, nearby code and tests, and useful recent commits.
-3. Briefly restate the goal, known constraints, success criteria, and important unknowns.
+2. Read applicable instructions (`AGENTS.md`, `CLAUDE.md` when present)
+   and enough repository overview to identify the areas relevant to the request.
+3. Complete the delegated research gate below before asking design questions
+   or proposing approaches.
+4. Briefly restate the goal, known constraints, success criteria, and important unknowns.
+
+#### Delegated research gate
+
+- Use the harness's actual subagent-spawning tool. Prefer a read-only
+  codebase exploration agent when available; a role description or research
+  performed by the main agent does not count as delegation.
+- Give each researcher one bounded question, relevant repository areas,
+  and the supplied goal and constraints. Run independent investigations
+  concurrently when supported. Do not require a fixed agent count,
+  assign whole-repository surveys, or delegate design decisions.
+- Require concise findings with inspected paths and symbols, current behavior,
+  relevant contracts, dependencies, tests, documentation and useful history,
+  and material unknowns. Distinguish inspected facts from inference.
+  Researchers must not edit files, run builds or tests, install dependencies,
+  or mutate external state. Return findings in the session without creating
+  repository research artifacts.
+- Wait for the required investigations to complete, inspect their findings,
+  and verify decisive source references yourself. Reconcile conflicting
+  findings. Identify which subagent investigated each area when summarizing
+  the research.
+- Perform fresh delegated research for each new brainstorm invocation.
+  Prior research summaries may guide the investigation, but do not satisfy
+  this invocation's research gate.
+  Within the same ongoing invocation, do not repeat completed investigations
+  after every clarification. Investigate additional areas only when new
+  decisions, scope changes, repository changes, or conflicting evidence
+  make them relevant.
+- If delegation is unavailable, fails, or is prohibited by higher-priority
+  policy for this scope, report the exact limitation and stop before design
+  clarification or approach selection. Do not silently substitute solo
+  research, claim unperformed delegation, or manufacture additional tasks
+  to make delegation permissible.
 
 ### 2. Clarify
 
