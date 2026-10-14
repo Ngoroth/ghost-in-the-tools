@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository access and native subagent delegation permitted for the selected scope."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.2.0"
+  version: "2.2.1"
 ---
 
 # Planning
@@ -141,6 +141,8 @@ Create exactly one file for the planning session:
 - Write in the conversation's language and preserve technical identifiers exactly.
 
 Each task should be one small, reviewable logical unit. Order tasks by dependency. Include exact paths and commands supported by repository evidence. Do not guess, use placeholders, or defer material choices to the implementer. State what observable result makes each task complete.
+
+Carry material, agreed architectural constraints into `Context and constraints` or `Selected approach`, and reference them from affected tasks rather than duplicating them. Identify appropriate evidence of compliance: existing checks, a focused test, or direct inspection may suffice. When the selected approach introduces an explicitly temporary adapter, flag, or parallel implementation, record its removal condition and how the transition preserves required compatibility. Permanent mechanisms do not require a removal condition. Do not require a separate architecture document, new tooling, or exhaustive class-level design when the change does not need it.
 
 Tasks may describe already-decided runtime behavior such as error handling, retries, or a fixed fallback. They must not branch into competing implementation paths or ask the implementer to select one. If feasibility of the chosen approach is not established and failure would require a different plan, stop and resolve that feasibility before writing this implementation plan.
 

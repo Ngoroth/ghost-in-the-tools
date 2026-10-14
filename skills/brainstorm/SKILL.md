@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository access and native subagent delegation permitted for the selected scope."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.1.0"
+  version: "2.1.1"
 ---
 
 # Brainstorm
@@ -101,6 +101,8 @@ separate issue register, or empty “no blockers” section is required.
 ### 4. Validate the design
 
 Present one short, coherent section at a time and confirm it before continuing. Cover only relevant areas, such as components, flows, contracts, persistence, failures, security, observability, testing, and rollout.
+
+When a change creates or alters architectural boundaries, explain the affected components' responsibilities, ownership of mutable state and invariants, dependency direction, and external effects and their failure behavior. Justify new boundaries against a simpler option, including preserving the current structure where viable. Cover only decisions material to the change; do not prescribe a particular architecture, design untouched areas, or settle local implementation details unnecessarily.
 
 Each section should explain a coherent design decision and its practical consequences. State exactly what the responsible party is being asked to confirm. Do not split a connected decision into trivial confirmations or ask again about an already approved decision unless new evidence changes it.
 

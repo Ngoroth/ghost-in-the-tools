@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires Git repository read access, permission to run project checks, and permission to write only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.3"
+  version: "2.0.4"
 ---
 
 # Code Review
@@ -103,7 +103,7 @@ Use four passes:
 1. **Plan and scope fidelity** — promised behavior, acceptance coverage, missing work, unapproved approach changes, and unrelated edits.
 2. **Correctness and risk** — contracts, errors, edge cases, authorization, trust boundaries, data/migrations, compatibility, concurrency, and recovery where relevant.
 3. **Tests and operability** — regression evidence, failure paths, logs, metrics, rollout, rollback, and required operational checks.
-4. **Simplicity and reuse** — duplicate utilities, unnecessary abstractions, dead code, and material divergence from deliberate project patterns.
+4. **Simplicity and reuse** — duplicate utilities, unnecessary abstractions, dead code, and material divergence from deliberate project patterns. Inspect the affected interaction across component boundaries, not only individual functions: check material agreed architectural constraints, dependency cycles, duplicated business rules, and unclear ownership of shared mutable state or external effects. For explicitly temporary paths introduced by the change, check their agreed removal conditions. These are investigation prompts, not automatic defects; record only problems introduced, activated, or materially worsened by the implementation, with concrete evidence and impact. Do not turn untouched architectural debt or a preferred pattern into required cleanup.
 
 Trace at least the most consequential changed path from input to observable output. For a bug fix, require a test or equivalent evidence that distinguishes pre-change failure from post-change success.
 
