@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository read access and permission to edit only the selected plan Markdown file."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.2"
+  version: "2.0.3"
 ---
 
 # Plan Review
@@ -80,6 +80,7 @@ Check only relevant dimensions:
 
 - **Goal traceability:** the plan solves the stated problem and covers every acceptance criterion.
 - **Decision fidelity:** it preserves approved brainstorm decisions unless repository evidence contradicts them.
+- **Architectural coherence:** where boundaries change, the plan preserves material agreed constraints and consistently assigns responsibilities, mutable state and invariants, and dependency direction. The transition preserves required compatibility, and explicitly temporary mechanisms have removal conditions. Approval of an approach does not exempt the design itself from review: report concrete defects with repository evidence and material consequences, not preferred patterns or unrelated redesigns.
 - **Repository grounding:** referenced paths, symbols, patterns, dependencies, and commands exist or are explicitly identified as assumptions or discovery steps.
 - **Executability:** tasks are ordered, bounded, and contain observable `Done when` criteria; the implementer does not have to infer completion.
 - **Correctness and completeness:** relevant failures, edge cases, compatibility, migrations, rollout, rollback, security, observability, and external actions are covered.
