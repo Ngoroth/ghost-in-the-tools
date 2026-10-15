@@ -51,6 +51,16 @@ Decision authority does not replace technical evidence, reviewer independence, o
 
 Implementation and fixes have no dedicated skill in this set. They are ordinary development work under the user's request and the approved plan; neither a reviewer nor this guide takes ownership of them implicitly.
 
+During authorized development, prefer suitable existing repository commands
+over reconstructing ad-hoc procedures. When a proven procedure is needed
+repeatedly and the concrete recurring benefit justifies the creation and
+maintenance cost, capture it in a small repository-local helper using
+existing conventions, within the authorized scope. Keep inputs explicit,
+preserve failure reporting, exercise success and failure paths, and document
+the invocation. This is ordinary implementation work, not a required workflow
+stage or permission to build speculative tooling, expand scope, or weaken
+verification.
+
 ## Sequence and transitions
 
 The full iteration follows this shape:
