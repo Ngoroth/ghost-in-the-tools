@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires Git repository read access, permission to run project checks, and permission to write only the selected docs/reviews/ Markdown artifact."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.4"
+  version: "2.0.5"
 ---
 
 # Code Review
@@ -77,7 +77,7 @@ review_status: pending
 
 Preserve unrelated frontmatter.
 
-The artifact is workflow evidence. This skill may create and update it, but must not stage, commit, push, or publish it. Preserve it through goal validation and wrap-up. Wrap-up keeps it as evidence and repairs its plan reference when the plan is archived; delete it only on a separate explicit request authorized by the responsible party.
+The artifact is workflow evidence. This skill may create and update it, but must not stage, commit, push, or publish it. Preserve it through goal validation and wrap-up. After authorized closure, wrap-up moves this artifact together with its plan into `docs/workflow/archive/<iteration-id>/`, repairs references, and leaves a concise `docs/changes/<iteration-id>.md` outcome. Archival preserves the evidence; permanent deletion still requires a separate explicit request authorized by the responsible party. Archived artifacts describe closed work; do not create a duplicate active review or reopen them merely because the former path moved.
 
 Keep the current review summary consistent with `review_status`. Label earlier verdicts `Round N (historical)` rather than as current. Any copied validation or acceptance status must be explicitly marked as an observation made at review time, not a current status. Do not write validation or acceptance state owned by another stage.
 

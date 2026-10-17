@@ -38,7 +38,7 @@ Implementation intentionally has no dedicated skill. The user's chosen process a
 - **`code-review`** — independently reviews the complete current change set and preserves its review artifact as workflow evidence.
 - **`goal-validation`** — validates the implemented outcome against the plan, records `PASS`, `FAIL`, or `BLOCKED` evidence, and keeps the responsible party's acceptance decision separate from the technical verdict.
 - **`backlog`** — stores deferred work as standalone files under `docs/backlog/` and safely transfers accepted non-blocking findings.
-- **`wrap-up`** — records the outcome, accepted limits, follow-ups, and lessons, then archives a genuinely closed plan.
+- **`wrap-up`** — automatically groups a genuinely closed iteration’s plan, review/validation, and exclusively owned brainstorm in one archive, leaving a concise outcome note and active backlog.
 - **`session-work-summary`** — briefly explains what changed in the current coding session, how it was done, and what was actually checked.
 - **`skill-improvement`** — optionally reviews selected work against the skill contract and discusses evidence-supported skill changes one at a time; discussion does not authorize application.
 
@@ -85,7 +85,21 @@ To make the skills repository-specific instead, copy the folders into `<reposito
 
 ## Repository contents
 
-Each skill is instruction-only and consists of one `SKILL.md`. There are no hooks, executables, or bundled automation scripts.
+Skills are Markdown instructions. `wrap-up` additionally bundles a Python 3 standard-library helper under `skills/wrap-up/scripts/` for safe document archival; copy the entire skill directory during installation. There are no hooks or agent-specific launchers.
+
+## Automatic document cleanup
+
+Invoke `wrap-up` normally after closure is authorized. It checks existing review/validation and acceptance, preserves agreed backlog work, writes one short `docs/changes/<iteration-id>.md`, and moves the selected plan, review/validation, and exclusively owned brainstorm into `docs/workflow/archive/<iteration-id>/`. Related Markdown references are updated. No extra cleanup stage or manual sorting is required. Shared brainstorms and active backlog remain in place; unrelated and legacy files are not swept automatically.
+
+The original evidence is preserved for later inspection and `skill-improvement`; read the short outcome first for new work. A rejected or unaccepted incomplete iteration is not archived. The helper performs mechanical file operations only: the skill owns closure decisions. Python 3 is required for archival; no packages need to be installed. See [wrap-up](skills/wrap-up/SKILL.md) for the dry-run/apply invocation and write boundaries.
+
+To run the cleanup helper’s local regression tests (no model calls):
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+These tests exercise file preservation, link rewriting, collisions, and failure handling, not end-to-end coding-agent behavior.
 
 ## License
 
