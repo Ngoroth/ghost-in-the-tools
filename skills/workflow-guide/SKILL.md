@@ -4,7 +4,7 @@ description: "Use to explain, select, or sequence the Ghost in the Tools skills,
 license: MIT
 metadata:
   author: "Daniil(Ngoroth)"
-  version: "2.0.4"
+  version: "2.0.5"
 ---
 
 # Workflow Guide
@@ -45,7 +45,7 @@ Decision authority does not replace technical evidence, reviewer independence, o
 | Independently check implemented changes | [code-review](../code-review/SKILL.md) | Explicit approved plan path and unambiguous Git scope → one continuing evidence artifact in `docs/reviews/`. |
 | Demonstrate that the goal and required criteria are met | [goal-validation](../goal-validation/SKILL.md) | Explicit code-review artifact path → technical validation and separately recorded acceptance in that artifact. |
 | Capture, list, inspect, or close deferred work | [backlog](../backlog/SKILL.md) | Requested operation and task or accepted finding → standalone items in `docs/backlog/`. Listing and inspection do not authorize implementation. |
-| Close an iteration and preserve its evidence | [wrap-up](../wrap-up/SKILL.md) | Selected plan, review/validation evidence, and supplied acceptance decision → closing section, agreed follow-ups, and archival when closure conditions hold. |
+| Close an iteration and preserve its evidence | [wrap-up](../wrap-up/SKILL.md) | Selected plan, review/validation evidence, and supplied acceptance decision → one short outcome note, agreed follow-ups, and automatic grouped archival when closure conditions hold. |
 | Explain the current session's result | [session-work-summary](../session-work-summary/SKILL.md) | Available conversation and tool evidence → concise chat summary, without new checks or file changes. |
 | Retrospect on selected work and discuss skill improvements | [skill-improvement](../skill-improvement/SKILL.md) | Explicit repository and plan(s) or time window plus available evidence → one proposed change at a time; no automatic application. |
 
@@ -99,7 +99,7 @@ Enter where the request and existing evidence place the task. A settled design n
 - **Code review to validation:** require `approved` or `approved-with-notes` and no unresolved `CRITICAL` or `MAJOR` findings. Missing external evidence alone is incomplete verification, not an implementation defect; validation determines its effect on acceptance criteria.
 - **Validation to acceptance:** `PASS`, `FAIL`, and `BLOCKED` describe evidence for each criterion. The aggregate technical status (`passed`, `failed`, or `blocked`) is separate from `acceptance_status` (`not_recorded`, `accepted`, `accepted_with_limitations`, or `rejected`). Acceptance cannot turn an unexecuted or failing check into a pass. New or worsened limitations require a decision covering them. Report failures or missing evidence so the responsible party can decide the next step; validation does not launch fixes.
 - **Validation remediation:** The validator derives and reports the result from evidence, then stops; the responsible party authorizes the next action within the existing mandate. If only execution proof is missing and the reviewed scope is unchanged, obtain the missing proof and return to goal-validation without a new code review. Changes to implementation, tests, or a required validation procedure need independent convergence review before goal-validation. Continue the same artifacts and finding IDs and bounded counters; never reset them.
-- **Acceptance to closure:** use wrap-up's closure rules and reread the authoritative artifacts before writing. Rejection prevents archival; failed or blocked criteria require explicit acceptance covering every current limitation. Invoking wrap-up is not itself acceptance. Keep review and validation evidence when archiving the plan.
+- **Acceptance to closure:** use wrap-up's closure rules and reread the authoritative artifacts before writing. Rejection prevents archival; failed or blocked criteria require explicit acceptance covering every current limitation. Invoking wrap-up is not itself acceptance. Archive the selected plan and review/validation together, plus exclusively owned brainstorms, under `docs/workflow/archive/<iteration-id>/`; preserve a short `docs/changes/<iteration-id>.md` outcome and keep shared documents and active backlog in place. This cleanup is part of authorized wrap-up, not another stage or manual sorting task. Do not bulk-archive unrelated history.
 
 Publication is outside this sequence: none of these skills automatically stages, commits, pushes, merges, deploys, or publishes.
 
