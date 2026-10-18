@@ -1,31 +1,85 @@
 ---
 name: wrap-up
-description: "Use to close an iteration: summarize lessons, capture agreed backlog work, and archive its plan."
+description: "Use to close an iteration, capture agreed follow-ups, and automatically archive its workflow documents with one concise outcome note."
 license: MIT
-compatibility: "Codex; requires repository file access and the backlog skill."
+compatibility: "Agent Skills-compatible coding agents; requires repository access, Python 3, and the backlog skill for agreed follow-ups."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.0.1"
+  version: "2.1.0"
 ---
 
 # Wrap up
 
-Close one iteration with minimal paperwork. Use the conversation's language.
+Close one iteration and tidy its workflow documents without making the responsible party sort files. Use the conversation's language. This is part of closure, not a new review or acceptance stage.
 
-Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer acceptance authority; report missing responsibility or decisions and reuse applicable decisions already supplied.
+Required decisions belong to the responsible party identified by the user's chosen process or supplied task context, whether a person or automated participant. Executing this skill does not confer acceptance authority. Reuse applicable decisions already supplied; report a genuinely missing decision instead of inventing it.
 
-1. **Read and confirm the prior stages are settled.** Locate the repository and selected plan; read its review/validation artifact and supplied acceptance decision. If the target is ambiguous, ask. Use existing evidence; do not rerun tests or review. Never invent acceptance or turn FAIL/BLOCKED into PASS.
-   - Use available session statuses only as consistency signals. Do not close while related work is still changing the selected artifacts. A stale `blocked` status alone does not prevent closure when the artifacts and explicit acceptance decision establish it. Repository artifacts remain authoritative; no session-manager integration is required.
-   - Immediately before the first write, reread the complete selected plan, review/validation artifact, acceptance record, and any backlog items that will be reused or changed. If they changed since the initial read, reconcile the wrap-up against the new state before writing. If they continue changing or conflict, stop instead of recording a stale result.
-2. **Capture agreed follow-ups.** Follow the existing `backlog` skill for explicitly requested tasks, accepted MINOR findings, and explicitly accepted validation limitations: deduplicate, write a standalone item, and verify it. Remove a source finding only for the backlog skill's authorized MINOR handoff; preserve failed or blocked validation evidence unchanged. Never hide required unfinished work in backlog outside that skill's explicit accepted-limitation rules. Mention unapproved ideas in the summary instead of creating tasks for them. Do not implement follow-ups.
-3. **Write a short closing section in the plan.** Add or update one `## Wrap-up`, not a separate report:
-   - **Result:** what was achieved and the existing technical verdict/evidence.
-   - **Acceptance and limits:** the actual decision from the responsible party, or “not supplied”; remaining checks and accepted limitations.
-   - **Follow-ups:** backlog paths and any useful unapproved suggestion.
-   - **Lessons:** up to three concrete observations → what to do differently next time. Omit empty or generic lessons; do not edit shared instructions or skills.
-   - Report every still-unchecked required task with its completion evidence. If required work is unfinished, report the responsible party's explicit accepted unfinished scope or the blocker. Do not tick tasks during wrap-up; an archived location alone does not prove completion.
-   Preserve original requirements, checkboxes, review findings, revisions, and verdicts except for the backlog skill's authorized handoff. This closing section is not a plan redesign.
-4. **Archive only a closed iteration.** Never archive when `acceptance_status` is `rejected` or the supplied acceptance decision rejects closure. Otherwise move the plan to `docs/plans/completed/<same-filename>` only when existing evidence establishes completion with no unresolved required work, or explicit acceptance by the responsible party covers every current failed or blocked criterion and its limitation. An invocation alone is not acceptance. Never change the technical `validation_status` to justify closure. Otherwise keep the plan where it is and report what prevents closure. Never overwrite a conflicting destination. Repair affected document links, including relative links inside the moved plan and its review's plan reference; do not rewrite code or configuration. Keep the review artifact as evidence; delete it only on a separate explicit request authorized by the responsible party.
-5. **Verify and stop.** Check the resulting files and links. A repeated invocation updates the same closing section and reuses existing backlog items; an already archived plan stays put. If any required write or verification fails, preserve the source and report partial progress, not successful closure. Report the plan's final path, technical validation status, acceptance status, backlog paths, and a short outcome.
+## 1. Establish closure before writing
 
-Only edit the selected plan, its archival location, accepted backlog handoffs, and directly affected documentation links. No code changes, test runs, new workflow stages, branch changes, stage/commit/push/merge, or automatic cleanup. Never store secrets.
+Read the selected plan, its complete review/validation artifact, supplied acceptance decision, and relevant backlog items. Resolve the target from explicit context and links, never modification time. Ask only if several targets remain possible.
+
+- Use existing evidence; do not rerun application tests or review. Do not invent acceptance, resolve review findings, tick implementation tasks, or convert `FAIL`/`BLOCKED` into `PASS`.
+- Require settled code review with no unresolved blocking findings, settled validation, and completion of required work, or explicit acceptance covering every remaining failed/blocked criterion and unfinished scope. A rejection prevents closure. Invoking wrap-up is not acceptance.
+- Preserve the technical verdict independently of acceptance. Missing external proof is not completion; an accepted limitation remains a limitation.
+- Do not close while related work is changing the selected artifacts. Available session statuses are consistency signals, not authority; a stale `blocked` session status alone does not override the artifacts and applicable decision.
+- Immediately before the first write, reread the complete plan, review/validation and acceptance record, and any backlog items to be changed. Reconcile changed evidence; stop if it remains inconsistent or active work continues.
+
+If closure is not established, report the exact blocker and leave the workflow documents in place. Do not create an outcome note or archive unfinished work.
+
+## 2. Preserve agreed follow-ups
+
+Use `backlog` only for explicitly requested tasks, accepted non-blocking MINOR findings, and explicitly accepted validation limitations. Deduplicate and verify each write before an authorized source-finding removal. Preserve failed/blocked validation evidence. Do not manufacture new tasks, defer unresolved blockers to disguise completion, or implement follow-ups. Active backlog stays in `docs/backlog/`, outside the archive.
+
+## 3. Select only this iteration's documents
+
+Use one stable iteration ID: the selected plan's full filename stem, including its timestamp. For a previously archived iteration, reuse its existing archive ID and note; do not create another lifecycle.
+
+Archive layout:
+
+```text
+docs/changes/<iteration-id>.md
+docs/workflow/archive/<iteration-id>/
+  plans/<original-plan-filename>.md
+  reviews/<original-review-filename>.md
+  brainstorm/<original-brainstorm-filename>.md  # when exclusively owned
+```
+
+- Select the exact plan and its linked review/validation artifact. Legacy plans under `docs/plans/completed/` can be selected explicitly; do not bulk-migrate them just because this skill runs.
+- Include a linked brainstorm only when it is no longer needed by another active plan. Check active Markdown references under `docs/plans/`, excluding legacy `completed/`; if ownership is shared or uncertain, leave the brainstorm in place and link to it. Do not ask the user to classify routine unambiguous ownership.
+- Do not archive application documentation, active backlog, unrelated plans/reviews, logs, transcripts, or arbitrary files. Existing loose documents are not permission for a repository-wide cleanup.
+- Preserve original requirements, decisions, checkboxes, finding IDs, rounds, evidence, validation and acceptance. Change only paths needed to keep references correct. Do not add another `## Wrap-up` section to the plan: the outcome note replaces that closing summary, not the evidence.
+
+## 4. Write one short outcome and archive automatically
+
+Compose the outcome note as a temporary UTF-8 Markdown file outside the repository using the environment's scratch directory. Never store secrets. Include only:
+
+- **Result:** what changed and the evidence-based technical verdict.
+- **Decisions:** material rationale useful for future maintenance; omit an empty section.
+- **Acceptance and limits:** actual decision, its source, remaining checks and accepted limitations. Identify still-unchecked required tasks with existing completion evidence or the explicitly accepted unfinished scope.
+- **Follow-ups:** existing backlog links and at most useful unapproved suggestions, clearly marked as such.
+- **Evidence:** links to the archived plan and review, plus the brainstorm (archived or shared).
+- **Lessons:** up to three concrete observations only when useful; do not edit skills or shared rules.
+
+Keep it concise; do not duplicate the plan, review rounds, raw logs, or add a separate retrospective. Links in this temporary file must be written as they should appear in `docs/changes/<iteration-id>.md`, not relative to the scratch directory.
+
+Use the bundled helper relative to this installed skill's directory, not a guessed repository-level tools directory. This file and its `scripts/` directory must be installed together. Substitute actual paths in this command:
+
+```text
+python <wrap-up-skill-dir>/scripts/archive_iteration.py --root <repository> --id <iteration-id> --plan <plan-path> --review <review-path> --summary-file <temporary-note>
+```
+
+Add `--brainstorm <brainstorm-path>` for each exclusively owned selected brainstorm. First inspect this dry run: selected destinations, outcome note, and affected Markdown references must match the authorized iteration. Then run the same command with `--apply`; this mechanical archival is included in an authorized wrap-up and does not require another routine confirmation. The helper does not decide acceptance: the closure gate above remains mandatory.
+
+The helper must refuse conflicting destinations and unsafe paths. It stores `.archive.json` integrity metadata inside each archive; when this iteration's link repairs affect an older archive or outcome, it verifies that complete older bundle before updating its affected integrity metadata. This is bookkeeping, not permission to rewrite historical findings or verdicts. Inspect the dry-run `limitations`: in a Git repository inbound references are scanned in tracked and non-ignored untracked Markdown only; ignored files, submodules, and symlink directories are not traversed. Outside Git, dependency/generated directories are also excluded. Do not claim those excluded references were checked. Single-line inline links and reference definitions (including blockquotes) are supported; relevant unsupported or ambiguous links cause a safe refusal. Fenced examples are preserved rather than rewritten.
+
+If Python is unavailable, the helper reports unsupported links, or a write/verification fails, preserve the source and report the exact blocker; do not substitute unverified ad-hoc deletion. Do not auto-install dependencies. Do not claim all-or-nothing crash recovery beyond the helper's documented guarantees.
+
+## 5. Verify and stop
+
+Read the resulting outcome and archived evidence. Verify the plan reference, technical/acceptance verdicts, backlog links, and affected document links. A successful process exit alone is not proof of semantically correct closure. Do not treat an archived location as proof of completion.
+
+A repeated invocation reuses the same files. If they already match, report no changes. Do not overwrite conflicting summaries or silently incorporate new work into a closed iteration; a changed outcome requires an explicitly scoped correction, not another archive ID. Do not reopen or revalidate closed work merely to tidy it.
+
+Report the outcome note, archive directory, technical validation status, acceptance status, backlog paths, and any retained shared brainstorm. Detailed evidence remains available for `skill-improvement`; new work should read the short outcome first and open archived details only when relevant.
+
+Only write the selected outcome note, selected workflow-document archive, agreed backlog handoffs, directly affected Markdown references, and integrity metadata for verified archive bundles affected by those repairs. No product code/configuration edits, application test runs, new stages, branch changes, stage/commit/push/merge, bulk legacy cleanup, or deletion of historical evidence. Archival removes only the selected originals after verified preservation; it does not authorize permanent deletion of the archive.

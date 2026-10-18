@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires read access to the selected repository, actual conversation/tool evidence when available, and canonical Ghost source and installed copies when comparing them."
 metadata:
   author: "Daniil(Ngoroth)"
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Skill Improvement
@@ -26,7 +26,7 @@ The retrospective and proposal discussion are read-only. Do not edit source, ski
 
 ## Evidence and historical context
 
-1. Read the selected plan and relevant decision/review/validation artifacts. Use available actual conversation history, skill invocations, tool calls and results, and contemporaneous skill versions. Treat summaries or retrospective recollections as leads, not replacements for inspectable evidence.
+1. Read the selected plan and relevant decision/review/validation artifacts. For a closed iteration, use `docs/changes/<iteration-id>.md` to locate original evidence under `docs/workflow/archive/<iteration-id>/`; the short outcome is an index, not a substitute for the archived evidence. Follow repaired links and do not infer that a moved original was deleted or must be recreated. Use available actual conversation history, skill invocations, tool calls and results, and contemporaneous skill versions. Treat summaries or retrospective recollections as leads, not replacements for inspectable evidence.
 2. Reconstruct what skill was actually invoked, what its contract said at that time, what work and handoffs followed, and what output or artifact was observed. Compare behavior to the historical contract version, not automatically to today's version.
 3. If the invocation, result, or historical contract cannot be found, say `unknown` and limit the conclusion. Do not infer an event from a current file, invent causal certainty, or report measured time/percentages without data. Distinguish observed fact, user-reported observation, and inference.
 4. When comparing Ghost, inspect the canonical source separately from each installed copy and label their versions or differences accurately. Do not treat an installed copy as canonical merely because it was used, or present a current source rule as if it governed an older event.
