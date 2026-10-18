@@ -57,6 +57,21 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(before, self.snapshot())
         self.assertFalse((self.root / 'docs/workflow').exists())
 
+    def test_multiple_inline_links_archive_without_crossing_destinations(self):
+        external = '[first](https://example.com/a) and [second](https://example.com/b)\n'
+        self.put('docs/plans/x.md', external + '[review](../reviews/x.md) and [asset](../../assets/a.png)\n')
+        self.put('README.md', '[plan](docs/plans/x.md#goal) and [review](docs/reviews/x.md)\n')
+        before = self.snapshot()
+        self.assertEqual(self.run_archive(apply=False)['status'], 'dry run')
+        self.assertEqual(before, self.snapshot())
+        self.run_archive()
+        archived = self.root / 'docs/workflow/archive/iteration-1/plans/x.md'
+        self.assertEqual(archived.read_text(),
+                         external + '[review](../reviews/x.md) and [asset](../../../../../assets/a.png)\n')
+        self.assertEqual((self.root / 'README.md').read_text(),
+                         '[plan](docs/workflow/archive/iteration-1/plans/x.md#goal) and '
+                         '[review](docs/workflow/archive/iteration-1/reviews/x.md)\n')
+
     def test_archive_links_metadata_and_evidence(self):
         self.assertEqual(self.run_archive()['status'], 'applied')
         archive = self.root / 'docs/workflow/archive/iteration-1'
@@ -466,11 +481,17 @@ class ArchiveTests(unittest.TestCase):
             self.run_archive()
 
     def test_unsupported_ambiguous_link_rejected_and_fences_opaque(self):
-        self.put('README.md', '[plan](docs/plans/x.md(foo))\n')
-        before = self.snapshot()
-        with self.assertRaises(helper.ArchiveError):
-            self.run_archive()
-        self.assertEqual(before, self.snapshot())
+        for text in [
+            '[plan](docs/plans/x.md(foo))\n',
+            '[valid](https://example.com/a) and [plan](docs/plans/x.md(foo))\n',
+            '[plan](docs/plans/x.md(foo)) and [valid](https://example.com/b)\n',
+        ]:
+            with self.subTest(text=text):
+                self.put('README.md', text)
+                before = self.snapshot()
+                with self.assertRaises(helper.ArchiveError):
+                    self.run_archive()
+                self.assertEqual(before, self.snapshot())
         self.put('README.md', '```md\n[plan](docs/plans/x.md)\n```\n')
         self.run_archive()
         self.assertEqual((self.root / 'README.md').read_text(), '```md\n[plan](docs/plans/x.md)\n```\n')

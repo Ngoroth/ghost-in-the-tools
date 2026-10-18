@@ -108,7 +108,7 @@ def rewrite(text, old, new, moves):
         relevant = old != new or any(p in line or posixpath.basename(p) in line for p in moves)
         remainder = REFERENCE.sub('', INLINE.sub('', line))
         if relevant and (re.search(r'<(?:a|img)\b', line, re.I)
-                         or re.search(r'\]\([^\n]*\([^\n]*\)', line)
+                         or re.search(r'\]\([^)\n]*\([^)\n]*\)', line)
                          or '](' in remainder
                          or re.search(r'<(?:\.\.?/|docs/)[^>]+>', remainder)):
             raise ArchiveError('unsupported ambiguous/HTML link in ' + old)
