@@ -86,22 +86,35 @@ def rewrite(text, old, new, moves):
             result += '#' + parsed.fragment
         return '<' + result + '>' if angle else result
 
-    relevant_document = old != new or any(posixpath.basename(p) in text for p in moves)
-    if relevant_document and re.search(r'\]\([ \t]*\r?\n|\]:[ \t]*\r?\n[ \t]*\S', text):
-        raise ArchiveError('unsupported multiline link in ' + old)
-    result = []
+    # Identify opaque blocks once, so validation and rewriting see the same text.
+    lines = []
     fence = None
     for line in text.splitlines(keepends=True):
-        marker = re.match(r'^ {0,3}(`{3,}|~{3,})', line)
+        prefix = re.match(r'^ {0,3}(?:> ? {0,3})*', line).group(0)
+        depth = prefix.count('>')
+        content = line[len(prefix):]
+        if fence is not None and depth < fence[1]:
+            fence = None  # An unclosed quoted fence ends with its blockquote.
+        marker = re.match(r'(`{3,}|~{3,})([^\r\n]*)', content)
+        opaque = fence is not None
         if marker:
-            token = marker.group(1)
+            token, tail = marker.groups()
             if fence is None:
-                fence = token
-            elif token[0] == fence[0] and len(token) >= len(fence):
+                # Backtick fence info strings cannot themselves contain backticks.
+                if token[0] != '`' or '`' not in tail:
+                    fence = (token, depth)
+                    opaque = True
+            elif (depth == fence[1] and token[0] == fence[0][0]
+                  and len(token) >= len(fence[0]) and not tail.strip(' \t')):
                 fence = None
-            result.append(line)
-            continue
-        if fence:
+        lines.append((line, opaque))
+    visible = ''.join('\n' if opaque else line for line, opaque in lines)
+    relevant_document = old != new or any(posixpath.basename(p) in visible for p in moves)
+    if relevant_document and re.search(r'\]\([ \t]*\r?\n|\]:[ \t]*\r?\n[ \t]*\S', visible):
+        raise ArchiveError('unsupported multiline link in ' + old)
+    result = []
+    for line, opaque in lines:
+        if opaque:
             result.append(line)
             continue
         # Refuse unsupported relevant constructs rather than silently breaking them.

@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository access, Python 3, and the backlog skill for agreed follow-ups."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.1.0"
+  version: "2.1.1"
 ---
 
 # Wrap up
@@ -71,6 +71,8 @@ python <wrap-up-skill-dir>/scripts/archive_iteration.py --root <repository> --id
 Add `--brainstorm <brainstorm-path>` for each exclusively owned selected brainstorm. First inspect this dry run: selected destinations, outcome note, and affected Markdown references must match the authorized iteration. Then run the same command with `--apply`; this mechanical archival is included in an authorized wrap-up and does not require another routine confirmation. The helper does not decide acceptance: the closure gate above remains mandatory.
 
 The helper must refuse conflicting destinations and unsafe paths. It stores `.archive.json` integrity metadata inside each archive; when this iteration's link repairs affect an older archive or outcome, it verifies that complete older bundle before updating its affected integrity metadata. This is bookkeeping, not permission to rewrite historical findings or verdicts. Inspect the dry-run `limitations`: in a Git repository inbound references are scanned in tracked and non-ignored untracked Markdown only; ignored files, submodules, and symlink directories are not traversed. Outside Git, dependency/generated directories are also excluded. Do not claim those excluded references were checked. Single-line inline links and reference definitions (including blockquotes) are supported; relevant unsupported or ambiguous links cause a safe refusal. Fenced examples are preserved rather than rewritten.
+
+Backtick and tilde fenced blocks, including those inside nested blockquotes, are excluded from both link validation and rewriting. Multiline link examples inside these blocks remain unchanged and do not block archival; live multiline links outside them still cause a safe refusal.
 
 If Python is unavailable, the helper reports unsupported links, or a write/verification fails, preserve the source and report the exact blocker; do not substitute unverified ad-hoc deletion. Do not auto-install dependencies. Do not claim all-or-nothing crash recovery beyond the helper's documented guarantees.
 

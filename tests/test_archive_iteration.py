@@ -480,6 +480,58 @@ class ArchiveTests(unittest.TestCase):
         with self.assertRaisesRegex(helper.ArchiveError, 'symlink'):
             self.run_archive()
 
+    def test_fenced_examples_preserved_while_live_links_rewritten(self):
+        for prefix in ['', '> ', '> > ']:
+            for fence in ['```', '~~~~']:
+                for newline in ['\n', '\r\n']:
+                    for rel, link in [('README.md', 'docs/plans/x.md'),
+                                      ('docs/plans/x.md', '../reviews/x.md')]:
+                        with self.subTest(prefix=prefix, fence=fence, newline=newline, document=rel), tempfile.TemporaryDirectory(dir=self.base) as directory:
+                            root = Path(directory) / 'repo'
+                            shutil.copytree(self.root, root)
+                            example = newline.join([
+                                prefix + fence + 'md',
+                                prefix + '[example](' + link + ')',
+                                prefix + '[multiline](',
+                                prefix + ' ' + link + ')',
+                                prefix + '[reference]:',
+                                prefix + ' ' + link,
+                                prefix + fence,
+                                '',
+                            ])
+                            live = '[live](' + link + ')' + newline
+                            (root / rel).write_bytes((example + live).encode('utf-8'))
+                            before = self.snapshot(root)
+                            self.run_archive(root=root, apply=False)
+                            self.assertEqual(before, self.snapshot(root))
+                            self.run_archive(root=root)
+                            if rel == 'README.md':
+                                output = root / rel
+                                expected_link = 'docs/workflow/archive/iteration-1/plans/x.md'
+                            else:
+                                output = root / 'docs/workflow/archive/iteration-1/plans/x.md'
+                                expected_link = '../reviews/x.md'
+                            self.assertEqual(output.read_bytes(),
+                                             (example + '[live](' + expected_link + ')' + newline).encode('utf-8'))
+
+    def test_fence_closes_only_with_matching_bare_marker(self):
+        for false_close in ['```', '~~~~', '````not-a-close', '> ````']:
+            with self.subTest(false_close=false_close), tempfile.TemporaryDirectory(dir=self.base) as directory:
+                root = Path(directory) / 'repo'
+                shutil.copytree(self.root, root)
+                example = '````md\n' + false_close + '\n[example](docs/plans/x.md)\n`````\n'
+                (root / 'README.md').write_text(example + '[live](docs/plans/x.md)\n', encoding='utf-8')
+                self.run_archive(root=root)
+                self.assertEqual((root / 'README.md').read_text(encoding='utf-8'),
+                                 example + '[live](docs/workflow/archive/iteration-1/plans/x.md)\n')
+
+    def test_unclosed_quoted_fence_ends_at_quote_boundary(self):
+        example = '> ```md\n> [example](docs/plans/x.md)\n'
+        self.put('README.md', example + '\n[plan](docs/plans/x.md)\n')
+        self.run_archive()
+        self.assertEqual((self.root / 'README.md').read_text(encoding='utf-8'),
+                         example + '\n[plan](docs/workflow/archive/iteration-1/plans/x.md)\n')
+
     def test_unsupported_ambiguous_link_rejected_and_fences_opaque(self):
         for text in [
             '[plan](docs/plans/x.md(foo))\n',
