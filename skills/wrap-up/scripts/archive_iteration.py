@@ -7,6 +7,9 @@ Relative URLs are URL-decoded/re-encoded; fragments and queries are retained. Fe
 opaque. Relevant HTML links and ambiguous/nested Markdown destinations fail
 closed. This is not a CommonMark parser. Inbound scanning is bounded by Git
 visibility or non-Git dependency exclusions; reports state these limitations.
+Relevant multiline links are refused with either LF or CRLF line endings.
+Repository paths must stay within root; symlinks and NTFS junctions in source
+or destination paths are refused, including their ancestors.
 Older bundles touched by link rewriting are verified before their manifests
 are updated. No concurrency/crash-atomic guarantee;
 caught write errors roll back, and inputs are rechecked before mutation.
@@ -18,6 +21,7 @@ import os
 from pathlib import Path, PurePosixPath
 import posixpath
 import re
+import stat
 import sys
 import subprocess
 from urllib.parse import quote, unquote, urlsplit
@@ -33,14 +37,24 @@ def digest(data):
 
 def safe(root, rel):
     p = PurePosixPath(rel)
-    if p.is_absolute() or not p.parts or '..' in p.parts or '\\' in rel:
+    if p.is_absolute() or Path(rel).drive or not p.parts or '..' in p.parts or '\\' in rel:
         raise ArchiveError('unsafe repository path: ' + rel)
     target = root.joinpath(*p.parts)
+    if root not in target.parents:
+        raise ArchiveError('unsafe repository path: ' + rel)
     for part in [target, *target.parents]:
         if part == root:
             break
-        if part.is_symlink():
+        try:
+            info = part.lstat()
+        except FileNotFoundError:
+            continue
+        if stat.S_ISLNK(info.st_mode):
             raise ArchiveError('symlink: ' + str(part))
+        if os.name == 'nt' and info.st_reparse_tag == stat.IO_REPARSE_TAG_MOUNT_POINT:
+            raise ArchiveError('junction: ' + str(part))
+    if root not in target.resolve().parents:
+        raise ArchiveError('path escapes repository root: ' + rel)
     if target.exists() and not target.is_file():
         raise ArchiveError('not a regular file: ' + rel)
     return target
@@ -73,7 +87,7 @@ def rewrite(text, old, new, moves):
         return '<' + result + '>' if angle else result
 
     relevant_document = old != new or any(posixpath.basename(p) in text for p in moves)
-    if relevant_document and re.search(r'\]\([ \t]*\n|\]:[ \t]*\n[ \t]*\S', text):
+    if relevant_document and re.search(r'\]\([ \t]*\r?\n|\]:[ \t]*\r?\n[ \t]*\S', text):
         raise ArchiveError('unsupported multiline link in ' + old)
     result = []
     fence = None

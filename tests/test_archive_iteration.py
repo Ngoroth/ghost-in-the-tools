@@ -3,6 +3,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -42,8 +43,9 @@ class ArchiveTests(unittest.TestCase):
         args.update(kwargs)
         return helper.archive(**args)
 
-    def snapshot(self):
-        return {p.relative_to(self.root).as_posix(): p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
+    def snapshot(self, root=None):
+        root = self.root if root is None else root
+        return {p.relative_to(root).as_posix(): p.read_bytes() for p in root.rglob('*') if p.is_file()}
 
     def test_cli_dry_run_no_writes(self):
         before = self.snapshot()
@@ -122,6 +124,74 @@ class ArchiveTests(unittest.TestCase):
         (self.root / 'docs/changes').symlink_to(self.base, target_is_directory=True)
         with self.assertRaises(helper.ArchiveError):
             self.run_archive()
+
+    @unittest.skipUnless(os.name == 'nt', 'NTFS junctions require Windows')
+    def test_junction_source_ancestors_preserve_files(self):
+        for rel in ['docs/plans', 'docs']:
+            for outside_root in [False, True]:
+                with self.subTest(ancestor=rel, outside_root=outside_root), tempfile.TemporaryDirectory(dir=self.base) as directory:
+                    root = Path(directory) / 'repo'
+                    shutil.copytree(self.root, root)
+                    link = root / rel
+                    target = (Path(directory) if outside_root else root) / 'junction-target'
+                    link.rename(target)
+                    try:
+                        subprocess.run(['cmd', '/c', 'mklink', '/J', str(link), str(target)],
+                                       check=True, capture_output=True)
+                        self.assertFalse(link.is_symlink())
+                        self.assertTrue(link.is_junction())
+                        before = self.snapshot(root)
+                        originals = {p.relative_to(target): p.read_bytes()
+                                     for p in target.rglob('*') if p.is_file()}
+                        with self.assertRaises(helper.ArchiveError):
+                            self.run_archive(root=root)
+                        self.assertEqual(before, self.snapshot(root))
+                        self.assertEqual(originals, {p.relative_to(target): p.read_bytes()
+                                                    for p in target.rglob('*') if p.is_file()})
+                    finally:
+                        link.rmdir()
+                        target.rename(link)
+
+    @unittest.skipUnless(os.name == 'nt', 'NTFS junctions require Windows')
+    def test_junction_destination_ancestors_preserve_files(self):
+        for rel in ['docs/workflow', 'docs/workflow/archive',
+                    'docs/workflow/archive/iteration-1',
+                    'docs/workflow/archive/iteration-1/plans', 'docs/changes']:
+            with self.subTest(ancestor=rel), tempfile.TemporaryDirectory(dir=self.base) as directory:
+                root = Path(directory) / 'repo'
+                shutil.copytree(self.root, root)
+                link = root / rel
+                link.parent.mkdir(parents=True, exist_ok=True)
+                with tempfile.TemporaryDirectory(dir=directory) as outside:
+                    target = Path(outside)
+                    sentinel = target / 'untouched.txt'
+                    sentinel.write_bytes(b'outside root')
+                    subprocess.run(['cmd', '/c', 'mklink', '/J', str(link), str(target)],
+                                   check=True, capture_output=True)
+                    try:
+                        before = self.snapshot(root)
+                        with self.assertRaises(helper.ArchiveError):
+                            self.run_archive(root=root)
+                        self.assertEqual(before, self.snapshot(root))
+                        self.assertEqual({p.name: p.read_bytes() for p in target.rglob('*') if p.is_file()},
+                                         {'untouched.txt': b'outside root'})
+                    finally:
+                        link.rmdir()
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows drive paths require Windows')
+    def test_windows_drive_paths_cannot_escape_root(self):
+        outside = self.base / 'outside.md'
+        outside.write_bytes(b'outside root')
+        relative_to_drive = outside.as_posix().replace(outside.drive + '/', outside.drive, 1)
+        before = self.snapshot()
+        for rel in [outside.as_posix(), relative_to_drive,
+                    (self.base / 'new.md').as_posix()]:
+            with self.subTest(path=rel):
+                with self.assertRaises(helper.ArchiveError):
+                    helper.safe(self.root.resolve(), rel)
+        self.assertEqual(before, self.snapshot())
+        self.assertEqual(outside.read_bytes(), b'outside root')
+        self.assertFalse((self.base / 'new.md').exists())
 
     def test_invalid_utf8_and_summary_collision(self):
         self.put('bad.md', 'x')
@@ -247,6 +317,20 @@ class ArchiveTests(unittest.TestCase):
             with self.assertRaises(helper.ArchiveError):
                 self.run_archive()
             self.assertEqual(before, self.snapshot())
+
+    def test_multiline_links_fail_closed_with_lf_and_crlf(self):
+        for newline in [b'\n', b'\r\n']:
+            for text in [b'[plan](' + newline + b' docs/plans/x.md)' + newline,
+                         b'[plan][p]' + newline + b'[p]: ' + newline + b' docs/plans/x.md' + newline]:
+                for rel in ['README.md', 'docs/plans/x.md']:
+                    with self.subTest(newline=newline, text=text, document=rel), tempfile.TemporaryDirectory(dir=self.base) as directory:
+                        root = Path(directory) / 'repo'
+                        shutil.copytree(self.root, root)
+                        (root / rel).write_bytes(text)
+                        before = self.snapshot(root)
+                        with self.assertRaises(helper.ArchiveError):
+                            self.run_archive(root=root)
+                        self.assertEqual(before, self.snapshot(root))
 
     def test_url_escaped_paths_query_fragment_and_reference_only(self):
         self.put('docs/plans/space name.md', '# Space\n[here](../reviews/x.md?q=one#check)\n')
