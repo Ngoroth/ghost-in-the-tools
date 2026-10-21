@@ -4,7 +4,7 @@ description: "Use to explain, select, or sequence the Ghost in the Tools skills,
 license: MIT
 metadata:
   author: "Daniil(Ngoroth)"
-  version: "2.0.5"
+  version: "2.0.6"
 ---
 
 # Workflow Guide
@@ -50,6 +50,14 @@ Decision authority does not replace technical evidence, reviewer independence, o
 | Retrospect on selected work and discuss skill improvements | [skill-improvement](../skill-improvement/SKILL.md) | Explicit repository and plan(s) or time window plus available evidence → one proposed change at a time; no automatic application. |
 
 Implementation and fixes have no dedicated skill in this set. They are ordinary development work under the user's request and the approved plan; neither a reviewer nor this guide takes ownership of them implicitly.
+
+When handing a runnable artifact to an external tester, distinguish it from
+earlier builds using an existing version/build identifier, a unique filename,
+or a checksum, and state the intended installation/update target. Correlate
+subsequent runtime reports with the artifact actually installed or executed;
+if its identity is unknown, say so before treating the report as evidence
+about the delivered fix. This is evidence provenance, not a new workflow
+stage or a requirement for full external reproduction.
 
 During authorized development, prefer suitable existing repository commands
 over reconstructing ad-hoc procedures. When a proven procedure is needed
