@@ -57,6 +57,33 @@ class ArchiveTests(unittest.TestCase):
         self.assertEqual(before, self.snapshot())
         self.assertFalse((self.root / 'docs/workflow').exists())
 
+    def test_preserve_frozen_markdown_without_skipping_other_rewrites(self):
+        frozen = 'fixtures/README.md'
+        self.put(frozen, 'Frozen provenance: `docs/plans/x.md`, revision 2.\n')
+        expected_bytes = (self.root / frozen).read_bytes()
+        before = self.snapshot()
+        command = [sys.executable, str(SCRIPT), '--root', str(self.root),
+                   '--plan', 'docs/plans/x.md', '--review', 'docs/reviews/x.md',
+                   '--summary-file', str(self.summary), '--id', 'iteration-1',
+                   '--preserve-markdown', frozen]
+        dry_run = subprocess.run(command, check=True, capture_output=True, text=True)
+        report = json.loads(dry_run.stdout)
+        self.assertNotIn(frozen, report['affected_markdown'])
+        self.assertIn('README.md', report['affected_markdown'])
+        self.assertTrue(any(frozen in note for note in report['limitations']))
+        self.assertEqual(before, self.snapshot())
+
+        subprocess.run([*command, '--apply'], check=True, capture_output=True, text=True)
+        self.assertEqual(expected_bytes, (self.root / frozen).read_bytes())
+        self.assertIn('docs/workflow/archive/iteration-1/plans/x.md#goal',
+                      (self.root / 'README.md').read_text(encoding='utf-8'))
+
+    def test_preservation_rejects_selected_plan(self):
+        before = self.snapshot()
+        with self.assertRaisesRegex(helper.ArchiveError, 'invalid preserved Markdown path'):
+            self.run_archive(preserve_markdown=['docs/plans/x.md'])
+        self.assertEqual(before, self.snapshot())
+
     def test_multiple_inline_links_archive_without_crossing_destinations(self):
         external = '[first](https://example.com/a) and [second](https://example.com/b)\n'
         self.put('docs/plans/x.md', external + '[review](../reviews/x.md) and [asset](../../assets/a.png)\n')

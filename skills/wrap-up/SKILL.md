@@ -5,7 +5,7 @@ license: MIT
 compatibility: "Agent Skills-compatible coding agents; requires repository access, Python 3, and the backlog skill for agreed follow-ups."
 metadata:
   author: "Daniil(Ngoroth) and Bes"
-  version: "2.1.1"
+  version: "2.2.0"
 ---
 
 # Wrap up
@@ -69,6 +69,12 @@ python <wrap-up-skill-dir>/scripts/archive_iteration.py --root <repository> --id
 ```
 
 Add `--brainstorm <brainstorm-path>` for each exclusively owned selected brainstorm. First inspect this dry run: selected destinations, outcome note, and affected Markdown references must match the authorized iteration. Then run the same command with `--apply`; this mechanical archival is included in an authorized wrap-up and does not require another routine confirmation. The helper does not decide acceptance: the closure gate above remains mandatory.
+
+If a Markdown file must remain byte-for-byte unchanged (for example, it is
+covered by a frozen fixture checksum), pass
+`--preserve-markdown <exact-repository-relative-path>`. Confirm the dry run
+lists it under limitations, not affected Markdown. After apply, verify its
+SHA-256 is unchanged. Historical references in that file are intentionally retained.
 
 The helper must refuse conflicting destinations and unsafe paths. It stores `.archive.json` integrity metadata inside each archive; when this iteration's link repairs affect an older archive or outcome, it verifies that complete older bundle before updating its affected integrity metadata. This is bookkeeping, not permission to rewrite historical findings or verdicts. Inspect the dry-run `limitations`: in a Git repository inbound references are scanned in tracked and non-ignored untracked Markdown only; ignored files, submodules, and symlink directories are not traversed. Outside Git, dependency/generated directories are also excluded. Do not claim those excluded references were checked. Single-line inline links and reference definitions (including blockquotes) are supported; relevant unsupported or ambiguous links cause a safe refusal. Fenced examples are preserved rather than rewritten.
 

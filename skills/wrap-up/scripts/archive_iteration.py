@@ -230,7 +230,7 @@ def verified_bundle(root, manifest_rel):
     return manifest, contents
 
 
-def archive(root, plan, review, brainstorm, summary_file, iteration, apply=False):
+def archive(root, plan, review, brainstorm, summary_file, iteration, apply=False, preserve_markdown=()):
     root = Path(root).resolve(strict=True)
     if not root.is_dir():
         raise ArchiveError('root is not a directory')
@@ -245,6 +245,13 @@ def archive(root, plan, review, brainstorm, summary_file, iteration, apply=False
             raise ArchiveError('document outside allowed directory: ' + rel)
         safe(root, rel)
     moves = {p: 'docs/workflow/archive/' + iteration + '/' + p[len('docs/'):] for p in selected}
+    preserved = set(preserve_markdown)
+    for rel in sorted(preserved):
+        path = safe(root, rel)
+        if (PurePosixPath(rel).as_posix() != rel or path.suffix.lower() != '.md'
+                or not path.is_file() or rel in selected
+                or rel.startswith(('docs/workflow/archive/', 'docs/changes/'))):
+            raise ArchiveError('invalid preserved Markdown path: ' + rel)
     summary_rel = 'docs/changes/' + iteration + '.md'
     manifest_rel = 'docs/workflow/archive/' + iteration + '/.archive.json'
     for rel in [*moves.values(), summary_rel, manifest_rel]:
@@ -273,9 +280,11 @@ def archive(root, plan, review, brainstorm, summary_file, iteration, apply=False
             raise ArchiveError('destination exists: ' + rel)
     snapshots = {}
     paths, limitations = markdown_paths(root)
+    limitations.extend('Preserved byte-for-byte; inbound references not rewritten: ' + rel
+                       for rel in sorted(preserved))
     # Explicit inputs are always included, even when Git-ignored. Their paths
     # were checked above; scanning exclusions never waive explicit path safety.
-    for rel in sorted(set(paths) | set(selected)):
+    for rel in sorted(set(paths) | set(selected) | preserved):
         path = safe(root, rel)
         if not path.is_file():
             raise ArchiveError('missing source: ' + rel)
@@ -287,6 +296,8 @@ def archive(root, plan, review, brainstorm, summary_file, iteration, apply=False
     changed = {}
     archived = {}
     for rel, data in snapshots.items():
+        if rel in preserved:
+            continue
         rewritten = rewrite(data.decode('utf-8'), rel, moves.get(rel, rel), moves).encode('utf-8')
         if rel in moves:
             archived[moves[rel]] = rewritten
@@ -387,11 +398,13 @@ def main():
     for name in ('root', 'plan', 'review', 'summary-file', 'id'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--brainstorm', action='append', default=[])
+    parser.add_argument('--preserve-markdown', action='append', default=[],
+                        help='Exact repository-relative immutable Markdown path; retain historical references.')
     parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
     try:
         print(json.dumps(archive(args.root, args.plan, args.review, args.brainstorm,
-                                 args.summary_file, args.id, args.apply), indent=2, sort_keys=True))
+                                 args.summary_file, args.id, args.apply, args.preserve_markdown), indent=2, sort_keys=True))
     except (OSError, ValueError) as error:
         print(json.dumps({'error': str(error)}), file=sys.stderr)
         return 1
